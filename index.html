@@ -47,26 +47,32 @@
             <div class="filter-actions">
               <button id="add-selected" class="secondary">Añadir seleccionados</button>
             </div>
+            <div class="filter-actions">
+              <button id="clear-filters" class="secondary">Eliminar filtros</button>
+            </div>
           </div>
           <div id="available-items" class="accordion"></div>
         </div>
 
         <div class="card">
           <h3>Ítems seleccionados</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Título</th>
-                  <th>Plazo</th>
-                  <th>Observaciones</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="selected-items"></tbody>
-            </table>
+          <div class="filter-row">
+            <label>
+              Instrucción
+              <select id="selected-filter-instruction"></select>
+            </label>
+            <label>
+              Línea de trabajo
+              <select id="selected-filter-work-line" disabled></select>
+            </label>
+            <div class="filter-actions">
+              <button id="remove-selected" class="secondary">Quitar seleccionados</button>
+            </div>
+            <div class="filter-actions">
+              <button id="clear-selected-filters" class="secondary">Eliminar filtros</button>
+            </div>
           </div>
+          <div id="selected-items" class="accordion"></div>
         </div>
 
         <div class="actions">

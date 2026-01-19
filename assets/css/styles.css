@@ -209,6 +209,10 @@ button.secondary {
   border-bottom: 1px solid #e5e7eb;
 }
 
+.item-row.selected-row {
+  grid-template-columns: 24px 1fr;
+}
+
 .item-row:last-child {
   border-bottom: none;
 }
@@ -229,8 +233,12 @@ button.secondary {
 
 @media (min-width: 720px) {
   .item-row {
-    grid-template-columns: 24px 120px 1fr 220px;
+    grid-template-columns: 24px 120px 1fr 220px auto;
     align-items: center;
+  }
+
+  .item-row.selected-row {
+    grid-template-columns: 24px 120px 1fr 180px 240px auto;
   }
 
   .item-title {

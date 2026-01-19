@@ -25,8 +25,13 @@ export const initPublic = ({ showToast }) => {
   const instructionSelect = document.querySelector("#filter-instruction");
   const workLineSelect = document.querySelector("#filter-work-line");
   const availableContainer = document.querySelector("#available-items");
-  const selectedBody = document.querySelector("#selected-items");
+  const selectedContainer = document.querySelector("#selected-items");
   const addSelectedButton = document.querySelector("#add-selected");
+  const clearFiltersButton = document.querySelector("#clear-filters");
+  const selectedInstructionSelect = document.querySelector("#selected-filter-instruction");
+  const selectedWorkLineSelect = document.querySelector("#selected-filter-work-line");
+  const removeSelectedButton = document.querySelector("#remove-selected");
+  const clearSelectedFiltersButton = document.querySelector("#clear-selected-filters");
   const exportButton = document.querySelector("#export-draft");
   const importInput = document.querySelector("#import-draft");
   const pdfButton = document.querySelector("#generate-pdf");
@@ -64,6 +69,51 @@ export const initPublic = ({ showToast }) => {
     }
   };
 
+  const renderSelectedWorkLineOptions = (instructionId, preferredValue = "") => {
+    selectedWorkLineSelect.innerHTML = "";
+    selectedWorkLineSelect.appendChild(buildOption("", "Todas"));
+    if (!instructionId) {
+      selectedWorkLineSelect.disabled = true;
+      return;
+    }
+
+    const { selections } = getReportState();
+    const instructionNameById = new Map(getInstructions().map((instruction) => [instruction.id, instruction.name]));
+    const workLineIdByName = new Map(getWorkLines().map((workLine) => [workLine.display_name, workLine.id]));
+    const instructionName = instructionNameById.get(instructionId);
+    const validLineIds = new Set();
+
+    selections.forEach((item) => {
+      if (item.instruction_uuid) {
+        if (item.instruction_uuid !== instructionId) return;
+        if (item.work_line_uuid) validLineIds.add(item.work_line_uuid);
+        return;
+      }
+      if (instructionName && item.instruction !== instructionName) return;
+      const lineId = item.work_line_uuid || workLineIdByName.get(item.work_line);
+      if (lineId) validLineIds.add(lineId);
+    });
+
+    if (!validLineIds.size) {
+      selectedWorkLineSelect.disabled = true;
+      return;
+    }
+
+    getWorkLines().forEach((workLine) => {
+      if (!validLineIds.has(workLine.id)) return;
+      selectedWorkLineSelect.appendChild(
+        buildOption(workLine.id, `${workLine.code} - ${workLine.display_name}`)
+      );
+    });
+
+    selectedWorkLineSelect.disabled = false;
+    if (preferredValue && validLineIds.has(preferredValue)) {
+      selectedWorkLineSelect.value = preferredValue;
+    } else {
+      selectedWorkLineSelect.value = "";
+    }
+  };
+
   const renderFilters = () => {
     const currentInstruction = instructionSelect.value;
     const currentWorkLine = workLineSelect.value;
@@ -79,6 +129,23 @@ export const initPublic = ({ showToast }) => {
     }
 
     renderWorkLineOptions(instructionSelect.value, currentWorkLine);
+  };
+
+  const renderSelectedFilters = () => {
+    const currentInstruction = selectedInstructionSelect.value;
+    const currentWorkLine = selectedWorkLineSelect.value;
+
+    selectedInstructionSelect.innerHTML = "";
+    selectedInstructionSelect.appendChild(buildOption("", "Todas"));
+    getInstructions().forEach((instruction) => {
+      selectedInstructionSelect.appendChild(buildOption(instruction.id, instruction.name));
+    });
+
+    if (currentInstruction) {
+      selectedInstructionSelect.value = currentInstruction;
+    }
+
+    renderSelectedWorkLineOptions(selectedInstructionSelect.value, currentWorkLine);
   };
 
   const renderAvailable = () => {
@@ -114,7 +181,7 @@ export const initPublic = ({ showToast }) => {
 
     grouped.forEach((group, instructionId) => {
       const details = document.createElement("details");
-      details.open = true;
+      details.open = false;
 
       const summary = document.createElement("summary");
       const summaryContent = document.createElement("div");
@@ -156,10 +223,20 @@ export const initPublic = ({ showToast }) => {
         line.className = "item-meta";
         line.textContent = item.work_line;
 
+        const addButton = document.createElement("button");
+        addButton.textContent = "Añadir";
+        addButton.className = "secondary";
+        addButton.addEventListener("click", () => {
+          addSelection(item);
+          renderSelected();
+          renderAvailable();
+        });
+
         row.appendChild(checkbox);
         row.appendChild(code);
         row.appendChild(title);
         row.appendChild(line);
+        row.appendChild(addButton);
         content.appendChild(row);
       });
 
@@ -181,17 +258,101 @@ export const initPublic = ({ showToast }) => {
 
   const renderSelected = () => {
     const { selections } = getReportState();
-    selectedBody.innerHTML = "";
+    selectedContainer.innerHTML = "";
 
     if (!selections.length) {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td colspan="5" class="muted">No has seleccionado ítems.</td>`;
-      selectedBody.appendChild(row);
+      const message = document.createElement("p");
+      message.className = "muted";
+      message.textContent = "No has seleccionado ítems.";
+      selectedContainer.appendChild(message);
       return;
     }
 
-    selections.forEach((item) => {
-      const row = document.createElement("tr");
+    const instructionFilter = selectedInstructionSelect.value;
+    const workLineFilter = selectedWorkLineSelect.value;
+    const instructionNameById = new Map(getInstructions().map((instruction) => [instruction.id, instruction.name]));
+    const workLineNameById = new Map(
+      getWorkLines().map((workLine) => [workLine.id, workLine.display_name])
+    );
+
+    const filtered = selections.filter((item) => {
+      if (instructionFilter) {
+        if (item.instruction_uuid) {
+          if (item.instruction_uuid !== instructionFilter) return false;
+        } else if (item.instruction !== instructionNameById.get(instructionFilter)) {
+          return false;
+        }
+      }
+      if (workLineFilter) {
+        if (item.work_line_uuid) {
+          if (item.work_line_uuid !== workLineFilter) return false;
+        } else if (item.work_line !== workLineNameById.get(workLineFilter)) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      const message = document.createElement("p");
+      message.className = "muted";
+      message.textContent = "No hay ítems seleccionados para los filtros.";
+      selectedContainer.appendChild(message);
+      return;
+    }
+
+    const grouped = filtered.reduce((acc, item) => {
+      const groupId = item.instruction_uuid || `name:${item.instruction}`;
+      if (!acc.has(groupId)) {
+        acc.set(groupId, {
+          label: item.instruction || instructionNameById.get(item.instruction_uuid) || "Sin instrucción",
+          items: []
+        });
+      }
+      acc.get(groupId).items.push(item);
+      return acc;
+    }, new Map());
+
+    grouped.forEach((group, instructionId) => {
+      const details = document.createElement("details");
+      details.open = false;
+
+      const summary = document.createElement("summary");
+      const summaryContent = document.createElement("div");
+      summaryContent.className = "accordion-summary";
+
+      const summaryCheckbox = document.createElement("input");
+      summaryCheckbox.type = "checkbox";
+      summaryCheckbox.className = "instruction-select";
+      summaryCheckbox.dataset.instructionId = instructionId;
+
+      const summaryLabel = document.createElement("span");
+      summaryLabel.textContent = `${group.label} (${group.items.length})`;
+
+      summaryContent.appendChild(summaryCheckbox);
+      summaryContent.appendChild(summaryLabel);
+      summary.appendChild(summaryContent);
+      details.appendChild(summary);
+
+      const content = document.createElement("div");
+      content.className = "accordion-content";
+
+      group.items.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "item-row selected-row";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.dataset.itemId = item.item_uuid;
+
+        const code = document.createElement("div");
+        code.className = "item-code";
+        code.textContent = item.item_code;
+
+        const title = document.createElement("div");
+        title.className = "item-title";
+        title.textContent = item.title;
+
       const plazoSelect = document.createElement("select");
       plazoSelect.appendChild(buildOption("", "Selecciona"));
       plazoOptions.forEach((option) => plazoSelect.appendChild(buildOption(option, option)));
@@ -208,23 +369,37 @@ export const initPublic = ({ showToast }) => {
         setObservations(item.item_uuid, event.target.value);
       });
 
-      row.innerHTML = `
-        <td>${item.item_code}</td>
-        <td>${item.title}</td>
-        <td></td>
-        <td></td>
-        <td><button data-id="${item.item_uuid}" class="secondary">Quitar</button></td>
-      `;
-      const cells = row.querySelectorAll("td");
-      cells[2].appendChild(plazoSelect);
-      cells[3].appendChild(observationsInput);
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Quitar";
+        removeButton.className = "secondary";
+        removeButton.addEventListener("click", () => {
+          removeSelection(item.item_uuid);
+          renderSelected();
+          renderAvailable();
+        });
 
-      row.querySelector("button").addEventListener("click", () => {
-        removeSelection(item.item_uuid);
-        renderSelected();
-        renderAvailable();
+        row.appendChild(checkbox);
+        row.appendChild(code);
+        row.appendChild(title);
+        row.appendChild(plazoSelect);
+        row.appendChild(observationsInput);
+        row.appendChild(removeButton);
+        content.appendChild(row);
       });
-      selectedBody.appendChild(row);
+
+      summaryCheckbox.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+
+      summaryCheckbox.addEventListener("change", (event) => {
+        const shouldCheck = event.target.checked;
+        content.querySelectorAll("input[type=\"checkbox\"][data-item-id]").forEach((checkbox) => {
+          checkbox.checked = shouldCheck;
+        });
+      });
+
+      details.appendChild(content);
+      selectedContainer.appendChild(details);
     });
   };
 
@@ -237,6 +412,7 @@ export const initPublic = ({ showToast }) => {
   const refresh = () => {
     itemsExport = getItemsExport();
     renderFilters();
+    renderSelectedFilters();
     renderAvailable();
     renderSelected();
     renderHeader();
@@ -255,6 +431,42 @@ export const initPublic = ({ showToast }) => {
     renderAvailable();
   });
   workLineSelect.addEventListener("change", renderAvailable);
+
+  clearFiltersButton.addEventListener("click", () => {
+    instructionSelect.value = "";
+    renderWorkLineOptions("");
+    renderAvailable();
+  });
+
+  selectedInstructionSelect.addEventListener("change", () => {
+    renderSelectedWorkLineOptions(selectedInstructionSelect.value);
+    renderSelected();
+  });
+  selectedWorkLineSelect.addEventListener("change", renderSelected);
+
+  clearSelectedFiltersButton.addEventListener("click", () => {
+    selectedInstructionSelect.value = "";
+    renderSelectedWorkLineOptions("");
+    renderSelected();
+  });
+
+  removeSelectedButton.addEventListener("click", () => {
+    const toRemove = [];
+    selectedContainer.querySelectorAll("input[type=\"checkbox\"][data-item-id]").forEach((checkbox) => {
+      if (!checkbox.checked) return;
+      toRemove.push(checkbox.dataset.itemId);
+    });
+
+    if (!toRemove.length) {
+      showToast("Selecciona al menos un ítem.");
+      return;
+    }
+
+    toRemove.forEach((id) => removeSelection(id));
+    renderSelected();
+    renderAvailable();
+    showToast("Ítems quitados.");
+  });
 
   addSelectedButton.addEventListener("click", () => {
     const { selections } = getReportState();
@@ -309,12 +521,6 @@ export const initPublic = ({ showToast }) => {
     const { selections } = getReportState();
     if (!selections.length) {
       showToast("Selecciona al menos un ítem.");
-      return;
-    }
-
-    const missingPlazo = selections.some((entry) => !entry.plazo);
-    if (missingPlazo) {
-      showToast("Todos los ítems necesitan un plazo.");
       return;
     }
 
