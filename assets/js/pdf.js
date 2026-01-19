@@ -45,6 +45,86 @@ const generatePdf = async ({ header, selections }) => {
     }
   };
 
+  const wrapText = (text, maxChars) => {
+    if (!text) return [""];
+    const words = text.split(" ");
+    const lines = [];
+    let current = "";
+
+    const pushCurrent = () => {
+      if (current) lines.push(current);
+      current = "";
+    };
+
+    words.forEach((word) => {
+      if (!current) {
+        if (word.length <= maxChars) {
+          current = word;
+        } else {
+          for (let i = 0; i < word.length; i += maxChars) {
+            lines.push(word.slice(i, i + maxChars));
+          }
+        }
+        return;
+      }
+
+      if (current.length + 1 + word.length <= maxChars) {
+        current = `${current} ${word}`;
+        return;
+      }
+
+      pushCurrent();
+      if (word.length <= maxChars) {
+        current = word;
+      } else {
+        for (let i = 0; i < word.length; i += maxChars) {
+          lines.push(word.slice(i, i + maxChars));
+        }
+      }
+    });
+
+    pushCurrent();
+    return lines.length ? lines : [""];
+  };
+
+  const drawWrappedRow = ({ title, plazo, observations, hasExtra }) => {
+    const size = 11;
+    const lineHeight = size + 4;
+    const usableWidth = pageSize[0] - margin * 2;
+    const gutter = 12;
+    const columnWidth = 170;
+    const leftWidth = hasExtra ? usableWidth - columnWidth * 2 - gutter * 2 : usableWidth;
+
+    const avgCharWidth = size * 0.55;
+    const leftMaxChars = Math.max(8, Math.floor(leftWidth / avgCharWidth));
+    const rightMaxChars = Math.max(8, Math.floor(columnWidth / avgCharWidth));
+
+    const titleLines = wrapText(title, leftMaxChars);
+    const plazoLines = hasExtra ? wrapText(plazo, rightMaxChars) : [];
+    const obsLines = hasExtra ? wrapText(observations, rightMaxChars) : [];
+
+    const rowLines = Math.max(titleLines.length, plazoLines.length, obsLines.length);
+    const rowHeight = rowLines * lineHeight;
+    ensureSpace(rowHeight + 8);
+
+    for (let i = 0; i < rowLines; i += 1) {
+      const y = cursorY - i * lineHeight;
+      const leftText = titleLines[i] || "";
+      page.drawText(leftText, { x: margin, y, size, font });
+
+      if (hasExtra) {
+        const plazoText = plazoLines[i] || "";
+        const obsText = obsLines[i] || "";
+        const plazoX = margin + leftWidth + gutter;
+        const obsX = plazoX + columnWidth + gutter;
+        page.drawText(plazoText, { x: plazoX, y, size, font });
+        page.drawText(obsText, { x: obsX, y, size, font });
+      }
+    }
+
+    cursorY -= rowHeight + 8;
+  };
+
 
 
   drawLine("Informe de objetivos 2026", { size: 18, bold: true, spacing: 10 });
@@ -70,14 +150,12 @@ const generatePdf = async ({ header, selections }) => {
       const plazo = safeText(item.plazo);
       const observations = safeText(item.observations);
       const hasExtra = Boolean(plazo || observations);
-      ensureSpace(hasExtra ? 42 : 24);
-      drawLine(`- ${title}`, { size: 11, spacing: hasExtra ? 4 : 8 });
-      if (plazo) {
-        drawLine(`Plazo: ${plazo}`, { size: 10, spacing: observations ? 4 : 8 });
-      }
-      if (observations) {
-        drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
-      }
+      drawWrappedRow({
+        title: `- ${title}`,
+        plazo: plazo ? `Plazo: ${plazo}` : "",
+        observations: observations ? `Observaciones: ${observations}` : "",
+        hasExtra
+      });
     });
   });
 
