@@ -23,8 +23,6 @@ const generatePdf = async ({ header, selections }) => {
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold || StandardFonts.Helvetica);
 
   const margin = 50;
-  const separatorColor = rgb(0.85, 0.85, 0.85);
-  const separatorWidth = 0.5;
   let cursorY = pageSize[1] - margin;
 
   const drawLine = (text, options = {}) => {
@@ -47,16 +45,6 @@ const generatePdf = async ({ header, selections }) => {
     }
   };
 
-  const drawSeparator = () => {
-    const y = cursorY - 4;
-    page.drawLine({
-      start: { x: margin, y },
-      end: { x: pageSize[0] - margin, y },
-      color: separatorColor,
-      thickness: separatorWidth
-    });
-    cursorY -= 10;
-  };
 
 
   drawLine("Informe de objetivos 2026", { size: 18, bold: true, spacing: 10 });
@@ -77,7 +65,7 @@ const generatePdf = async ({ header, selections }) => {
     ensureSpace(30);
     drawLine(instruction, { size: 14, bold: true, spacing: 8 });
 
-    items.forEach((item, index) => {
+    items.forEach((item) => {
       const title = safeText(item.title);
       const plazo = safeText(item.plazo);
       const observations = safeText(item.observations);
@@ -89,9 +77,6 @@ const generatePdf = async ({ header, selections }) => {
       }
       if (observations) {
         drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
-      }
-      if (index < items.length - 1) {
-        drawSeparator();
       }
     });
   });
