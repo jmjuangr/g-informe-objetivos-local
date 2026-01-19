@@ -55,37 +55,30 @@ const generatePdf = async ({ header, selections }) => {
     if (!acc[instruction]) {
       acc[instruction] = {};
     }
-    const workLine = safeText(item.work_line) || "Sin línea";
-    if (!acc[instruction][workLine]) {
-      acc[instruction][workLine] = [];
+    if (!acc[instruction]) {
+      acc[instruction] = [];
     }
-    acc[instruction][workLine].push(item);
+    acc[instruction].push(item);
     return acc;
   }, {});
 
-  Object.entries(grouped).forEach(([instruction, workLines]) => {
+  Object.entries(grouped).forEach(([instruction, items]) => {
     ensureSpace(30);
     drawLine(instruction, { size: 14, bold: true, spacing: 8 });
 
-    Object.entries(workLines).forEach(([workLine, items]) => {
-      ensureSpace(24);
-      drawLine(workLine, { size: 12, bold: true, spacing: 6 });
-
-      items.forEach((item) => {
-        const code = safeText(item.item_code);
-        const title = safeText(item.title);
-        const plazo = safeText(item.plazo);
-        const observations = safeText(item.observations);
-        const hasExtra = Boolean(plazo || observations);
-        ensureSpace(hasExtra ? 42 : 24);
-        drawLine(`- ${code} - ${title}`, { size: 11, spacing: hasExtra ? 4 : 8 });
-        if (plazo) {
-          drawLine(`Plazo: ${plazo}`, { size: 10, spacing: observations ? 4 : 8 });
-        }
-        if (observations) {
-          drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
-        }
-      });
+    items.forEach((item) => {
+      const title = safeText(item.title);
+      const plazo = safeText(item.plazo);
+      const observations = safeText(item.observations);
+      const hasExtra = Boolean(plazo || observations);
+      ensureSpace(hasExtra ? 42 : 24);
+      drawLine(`- ${title}`, { size: 11, spacing: hasExtra ? 4 : 8 });
+      if (plazo) {
+        drawLine(`Plazo: ${plazo}`, { size: 10, spacing: observations ? 4 : 8 });
+      }
+      if (observations) {
+        drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
+      }
     });
   });
 
