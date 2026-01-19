@@ -8,7 +8,6 @@ El repositorio solo contiene archivos estáticos (HTML/CSS/JS) y no requiere Nod
 1. Descarga el `.zip` del proyecto y descomprímelo.
 2. Abre `index.html` con doble click (modo `file://`).
 3. Usa el generador público para seleccionar ítems, indicar plazos y exportar el PDF.
-4. Accede a `#/login` para editar el catálogo (contraseña local por defecto: `admin`).
 
 ## Persistencia local
 

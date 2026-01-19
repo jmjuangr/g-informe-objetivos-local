@@ -61,9 +61,6 @@ body {
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
-.card.small {
-  max-width: 360px;
-}
 
 .grid {
   display: grid;
@@ -171,18 +168,6 @@ button.secondary {
   transform: translateY(0);
 }
 
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.helper {
-  margin-top: 12px;
-  color: #64748b;
-  font-size: 0.9rem;
-}
 
 @keyframes fadeIn {
   from {

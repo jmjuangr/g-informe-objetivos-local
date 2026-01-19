@@ -12,8 +12,6 @@
         <h1>Informe de objetivos 2026</h1>
         <nav class="nav">
           <a href="#/">Generador</a>
-          <a href="#/login">Login admin</a>
-          <a href="#/admin">Administración</a>
         </nav>
       </div>
     </header>
@@ -91,56 +89,6 @@
         </div>
       </section>
 
-      <section id="view-login" class="view">
-        <h2>Login admin</h2>
-        <div class="card small">
-          <label>
-            Contraseña
-            <input type="password" id="admin-password" placeholder="Contraseña" />
-          </label>
-          <button id="admin-login">Entrar</button>
-          <p class="helper">Acceso local para editar el catálogo.</p>
-        </div>
-      </section>
-
-      <section id="view-admin" class="view">
-        <div class="admin-header">
-          <h2>Panel de administración</h2>
-          <button id="admin-logout" class="secondary">Cerrar sesión</button>
-        </div>
-
-        <div class="card">
-          <div class="grid">
-            <label>
-              Entidad
-              <select id="admin-entity"></select>
-            </label>
-            <label>
-              Buscar
-              <input type="search" id="admin-search" placeholder="Filtrar por texto" />
-            </label>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 id="admin-form-title">Crear / editar</h3>
-          <form id="admin-form" class="grid"></form>
-          <div class="actions">
-            <button id="admin-save">Guardar</button>
-            <button id="admin-cancel" class="secondary" type="button">Cancelar</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Listado</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead id="admin-table-head"></thead>
-              <tbody id="admin-table-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
     </main>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
