@@ -5,12 +5,15 @@ const {
   addSelection,
   exportDraft,
   getReportState,
+  getLanguage,
   importDraft,
   plazoOptions,
   removeSelection,
+  setLanguage,
   setHeader,
   setObservations,
-  setPlazo
+  setPlazo,
+  syncSelectionsFromCatalog
 } = app.state;
 const { generatePdf } = app.pdf;
 
@@ -33,10 +36,10 @@ const { generatePdf } = app.pdf;
     return `informe_objetivos_2026_${safeEntity || "entidad"}.${extension}`;
   };
 
-  const buildWorkLineSortMaps = () => {
+  const buildWorkLineSortMaps = (language) => {
     const byId = new Map();
     const byName = new Map();
-    getWorkLines().forEach((workLine, index) => {
+    getWorkLines(language).forEach((workLine, index) => {
       const sortValue = Number.isFinite(workLine.sort_order) ? workLine.sort_order : index;
       byId.set(workLine.id, sortValue);
       byName.set(workLine.display_name, sortValue);
@@ -67,6 +70,7 @@ const { generatePdf } = app.pdf;
 
 const initPublic = ({ showToast }) => {
   const entityInput = document.querySelector("#header-entity");
+  const languageSelect = document.querySelector("#header-language");
   const managerInput = document.querySelector("#header-manager");
   const instructionSelect = document.querySelector("#filter-instruction");
   const workLineSelect = document.querySelector("#filter-work-line");
@@ -82,7 +86,8 @@ const initPublic = ({ showToast }) => {
   const importInput = document.querySelector("#import-draft");
   const pdfButton = document.querySelector("#generate-pdf");
 
-  let itemsExport = getItemsExport();
+  let currentLanguage = getLanguage();
+  let itemsExport = getItemsExport(currentLanguage);
 
   const renderWorkLineOptions = (instructionId, preferredValue = "") => {
     workLineSelect.innerHTML = "";
@@ -100,7 +105,7 @@ const initPublic = ({ showToast }) => {
       return;
     }
 
-    getWorkLines().forEach((workLine) => {
+    getWorkLines(currentLanguage).forEach((workLine) => {
       if (!validLineIds.has(workLine.id)) return;
       workLineSelect.appendChild(
         buildOption(workLine.id, `${workLine.code} - ${workLine.display_name}`)
@@ -124,8 +129,12 @@ const initPublic = ({ showToast }) => {
     }
 
     const { selections } = getReportState();
-    const instructionNameById = new Map(getInstructions().map((instruction) => [instruction.id, instruction.name]));
-    const workLineIdByName = new Map(getWorkLines().map((workLine) => [workLine.display_name, workLine.id]));
+    const instructionNameById = new Map(
+      getInstructions(currentLanguage).map((instruction) => [instruction.id, instruction.name])
+    );
+    const workLineIdByName = new Map(
+      getWorkLines(currentLanguage).map((workLine) => [workLine.display_name, workLine.id])
+    );
     const instructionName = instructionNameById.get(instructionId);
     const validLineIds = new Set();
 
@@ -145,7 +154,7 @@ const initPublic = ({ showToast }) => {
       return;
     }
 
-    getWorkLines().forEach((workLine) => {
+    getWorkLines(currentLanguage).forEach((workLine) => {
       if (!validLineIds.has(workLine.id)) return;
       selectedWorkLineSelect.appendChild(
         buildOption(workLine.id, `${workLine.code} - ${workLine.display_name}`)
@@ -166,7 +175,7 @@ const initPublic = ({ showToast }) => {
 
     instructionSelect.innerHTML = "";
     instructionSelect.appendChild(buildOption("", "Todas"));
-    getInstructions().forEach((instruction) => {
+    getInstructions(currentLanguage).forEach((instruction) => {
       instructionSelect.appendChild(buildOption(instruction.id, instruction.name));
     });
 
@@ -183,7 +192,7 @@ const initPublic = ({ showToast }) => {
 
     selectedInstructionSelect.innerHTML = "";
     selectedInstructionSelect.appendChild(buildOption("", "Todas"));
-    getInstructions().forEach((instruction) => {
+    getInstructions(currentLanguage).forEach((instruction) => {
       selectedInstructionSelect.appendChild(buildOption(instruction.id, instruction.name));
     });
 
@@ -199,7 +208,7 @@ const initPublic = ({ showToast }) => {
     const selectedIds = new Set(selections.map((entry) => entry.item_uuid));
     const instructionFilter = instructionSelect.value;
     const workLineFilter = workLineSelect.value;
-    const workLineMaps = buildWorkLineSortMaps();
+    const workLineMaps = buildWorkLineSortMaps(currentLanguage);
 
     const filtered = itemsExport.filter((item) => {
       if (selectedIds.has(item.item_uuid)) return false;
@@ -313,11 +322,13 @@ const initPublic = ({ showToast }) => {
 
     const instructionFilter = selectedInstructionSelect.value;
     const workLineFilter = selectedWorkLineSelect.value;
-    const instructionNameById = new Map(getInstructions().map((instruction) => [instruction.id, instruction.name]));
-    const workLineNameById = new Map(
-      getWorkLines().map((workLine) => [workLine.id, workLine.display_name])
+    const instructionNameById = new Map(
+      getInstructions(currentLanguage).map((instruction) => [instruction.id, instruction.name])
     );
-    const workLineMaps = buildWorkLineSortMaps();
+    const workLineNameById = new Map(
+      getWorkLines(currentLanguage).map((workLine) => [workLine.id, workLine.display_name])
+    );
+    const workLineMaps = buildWorkLineSortMaps(currentLanguage);
 
     const filtered = selections.filter((item) => {
       if (instructionFilter) {
@@ -447,10 +458,15 @@ const initPublic = ({ showToast }) => {
     const { header } = getReportState();
     entityInput.value = header.entity;
     managerInput.value = header.manager;
+    if (languageSelect) {
+      languageSelect.value = currentLanguage;
+    }
   };
 
   const refresh = () => {
-    itemsExport = getItemsExport();
+    currentLanguage = getLanguage();
+    itemsExport = getItemsExport(currentLanguage);
+    syncSelectionsFromCatalog(itemsExport);
     renderFilters();
     renderSelectedFilters();
     renderAvailable();
@@ -465,6 +481,13 @@ const initPublic = ({ showToast }) => {
   managerInput.addEventListener("input", (event) => {
     setHeader({ manager: event.target.value });
   });
+
+  if (languageSelect) {
+    languageSelect.addEventListener("change", (event) => {
+      setLanguage(event.target.value);
+      refresh();
+    });
+  }
 
   instructionSelect.addEventListener("change", () => {
     renderWorkLineOptions(instructionSelect.value);
