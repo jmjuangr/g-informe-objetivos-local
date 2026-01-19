@@ -112,3 +112,72 @@ Estructura:
     "legacy_item_code": null
   }]
 }
+
+## Reglas
+
+- **IDs:** `crypto.randomUUID()`.
+- **`year`** en `items_objetivo`: **SIEMPRE 2026** (no editable).
+- **`plazo`**: **NO se guarda** en la “BBDD”; solo en el **borrador del informe**.
+
+---
+
+## 4.3 Vista plana equivalente a `v_items_export`
+
+No existe una VIEW SQL, pero la aplicación debe construir una “vista” en memoria para UI/PDF.
+
+**Columnas mínimas:**
+- `item_uuid`, `item_code` ( `legacy_item_code` o id corto), `title`, `status`, `year`
+- `instruction_uuid`, `instruction`, `commission`
+- `matter`, `submatter`
+- `work_line_uuid`, `work_line_code`, `work_line`
+
+---
+
+
+
+## 5. Navegación / “Rutas”
+
+Como no hay servidor ni Next.js, se define navegación por:
+- **Hash routing (recomendado):** `index.html#/`, `index.html#/login`, `index.html#/admin`
+- **Alternativa válida:** una sola página con secciones y estado.
+
+**Vistas requeridas:**
+- Pública: Generador de informes
+- Login admin
+- Admin dashboard (CRUD)
+
+---
+
+## 6. UI/UX
+
+- Interfaz clara y simple (no dependiente de CDNs).
+- Feedback: mensajes inline o “toasts” implementados sin librerías externas (o librería incluida localmente).
+- Acciones típicas: Añadir / Quitar / Guardar / Exportar JSON / Importar JSON / Exportar PDF.
+
+---
+
+## 7. Criterios de aceptación (Definition of Done)
+
+Se considera entregado si:
+
+### Ejecución
+- Descargar zip, descomprimir, abrir `index.html` y funciona.
+- Funciona sin Internet.
+
+### Persistencia local
+- Crear/editar catálogo en admin, cerrar pestaña, volver a abrir `index.html` y los datos siguen.
+
+### Generador
+- Selección en cascada funciona.
+- No duplica ítems.
+- Plazo requerido por ítem.
+
+### Export/Import JSON
+- Exporta e importa borradores del informe.
+
+### PDF
+- Se genera 100% client-side.
+- Respeta el orden/agrupación indicada.
+
+### No backend
+- No existe API server, ni Supabase, ni llamadas remotas.
