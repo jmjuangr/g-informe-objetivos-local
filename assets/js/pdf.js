@@ -23,10 +23,8 @@ const generatePdf = async ({ header, selections }) => {
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold || StandardFonts.Helvetica);
 
   const margin = 50;
-  const tableLeft = margin;
-  const tableRight = pageSize[0] - margin;
-  const borderColor = rgb(0.8, 0.8, 0.8);
-  const borderWidth = 0.5;
+  const separatorColor = rgb(0.85, 0.85, 0.85);
+  const separatorWidth = 0.5;
   let cursorY = pageSize[1] - margin;
 
   const drawLine = (text, options = {}) => {
@@ -49,34 +47,17 @@ const generatePdf = async ({ header, selections }) => {
     }
   };
 
-  const drawRowBox = (topY, bottomY) => {
-    const top = Math.max(topY, bottomY);
-    const bottom = Math.min(topY, bottomY);
+  const drawSeparator = () => {
+    const y = cursorY + 2;
     page.drawLine({
-      start: { x: tableLeft, y: top },
-      end: { x: tableRight, y: top },
-      color: borderColor,
-      thickness: borderWidth
+      start: { x: margin, y },
+      end: { x: pageSize[0] - margin, y },
+      color: separatorColor,
+      thickness: separatorWidth
     });
-    page.drawLine({
-      start: { x: tableLeft, y: bottom },
-      end: { x: tableRight, y: bottom },
-      color: borderColor,
-      thickness: borderWidth
-    });
-    page.drawLine({
-      start: { x: tableLeft, y: top },
-      end: { x: tableLeft, y: bottom },
-      color: borderColor,
-      thickness: borderWidth
-    });
-    page.drawLine({
-      start: { x: tableRight, y: top },
-      end: { x: tableRight, y: bottom },
-      color: borderColor,
-      thickness: borderWidth
-    });
+    cursorY -= 6;
   };
+
 
   drawLine("Informe de objetivos 2026", { size: 18, bold: true, spacing: 10 });
   drawLine(`Entidad: ${safeText(header.entity)}`);
@@ -96,13 +77,12 @@ const generatePdf = async ({ header, selections }) => {
     ensureSpace(30);
     drawLine(instruction, { size: 14, bold: true, spacing: 8 });
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       const title = safeText(item.title);
       const plazo = safeText(item.plazo);
       const observations = safeText(item.observations);
       const hasExtra = Boolean(plazo || observations);
-      ensureSpace(hasExtra ? 46 : 28);
-      const rowTop = cursorY + 6;
+      ensureSpace(hasExtra ? 42 : 24);
       drawLine(`- ${title}`, { size: 11, spacing: hasExtra ? 4 : 8 });
       if (plazo) {
         drawLine(`Plazo: ${plazo}`, { size: 10, spacing: observations ? 4 : 8 });
@@ -110,8 +90,9 @@ const generatePdf = async ({ header, selections }) => {
       if (observations) {
         drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
       }
-      const rowBottom = cursorY + 2;
-      drawRowBox(rowTop, rowBottom);
+      if (index < items.length - 1) {
+        drawSeparator();
+      }
     });
   });
 
