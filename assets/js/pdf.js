@@ -17,7 +17,7 @@ const generatePdf = async ({ header, selections }) => {
 
   const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
   const pdfDoc = await PDFDocument.create();
-  const pageSize = [595.28, 841.89];
+  const pageSize = [841.89, 595.28];
   let page = pdfDoc.addPage(pageSize);
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold || StandardFonts.Helvetica);
@@ -74,15 +74,16 @@ const generatePdf = async ({ header, selections }) => {
       items.forEach((item) => {
         const code = safeText(item.item_code);
         const title = safeText(item.title);
-        const plazo = safeText(item.plazo) || "—";
+        const plazo = safeText(item.plazo);
         const observations = safeText(item.observations);
-        ensureSpace(42);
-        drawLine(`- ${code} - ${title}`, { size: 11, spacing: 4 });
-        drawLine(`Plazo: ${plazo}`, { size: 10, spacing: 4 });
+        const hasExtra = Boolean(plazo || observations);
+        ensureSpace(hasExtra ? 42 : 24);
+        drawLine(`- ${code} - ${title}`, { size: 11, spacing: hasExtra ? 4 : 8 });
+        if (plazo) {
+          drawLine(`Plazo: ${plazo}`, { size: 10, spacing: observations ? 4 : 8 });
+        }
         if (observations) {
           drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
-        } else {
-          drawLine("Observaciones: —", { size: 10, spacing: 8 });
         }
       });
     });
