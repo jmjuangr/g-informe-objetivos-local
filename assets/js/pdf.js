@@ -10,6 +10,9 @@ const generatePdf = async ({ header, selections }) => {
     String(value ?? "")
       .replace(/[\r\n\t]+/g, " ")
       .replace(/\s+/g, " ")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\x20-\x7E]/g, "")
       .trim();
 
   const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
@@ -74,7 +77,7 @@ const generatePdf = async ({ header, selections }) => {
         const plazo = safeText(item.plazo) || "—";
         const observations = safeText(item.observations);
         ensureSpace(42);
-        drawLine(`• ${code} — ${title}`, { size: 11, spacing: 4 });
+        drawLine(`- ${code} - ${title}`, { size: 11, spacing: 4 });
         drawLine(`Plazo: ${plazo}`, { size: 10, spacing: 4 });
         if (observations) {
           drawLine(`Observaciones: ${observations}`, { size: 10, spacing: 8 });
