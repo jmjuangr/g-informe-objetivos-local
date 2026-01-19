@@ -24,6 +24,23 @@ const generatePdf = async ({ header, selections }) => {
 
   const margin = 50;
   let cursorY = pageSize[1] - margin;
+  let isFirstPage = true;
+
+  const loadBinary = (url) =>
+    new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.responseType = "arraybuffer";
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(new Uint8Array(xhr.response));
+        } else {
+          reject(new Error(`No se pudo cargar ${url}`));
+        }
+      };
+      xhr.onerror = () => reject(new Error(`No se pudo cargar ${url}`));
+      xhr.send();
+    });
 
   const drawLine = (text, options = {}) => {
     const size = options.size || 12;
@@ -42,6 +59,7 @@ const generatePdf = async ({ header, selections }) => {
     if (cursorY - heightNeeded < margin) {
       page = pdfDoc.addPage(pageSize);
       cursorY = pageSize[1] - margin;
+      isFirstPage = false;
     }
   };
 
@@ -126,6 +144,27 @@ const generatePdf = async ({ header, selections }) => {
   };
 
 
+
+  if (isFirstPage) {
+    try {
+      const logoBytes = await loadBinary("assets/img/Gestiona-RGB.png");
+      const logoImage = await pdfDoc.embedPng(logoBytes);
+      const logoWidth = 90;
+      const scale = logoWidth / logoImage.width;
+      const logoHeight = logoImage.height * scale;
+      const logoX = margin;
+      const logoY = pageSize[1] - margin - logoHeight;
+      page.drawImage(logoImage, {
+        x: logoX,
+        y: logoY,
+        width: logoWidth,
+        height: logoHeight
+      });
+      cursorY = Math.min(cursorY, logoY - 12);
+    } catch (error) {
+      console.warn("No se pudo cargar el logo para el PDF.", error);
+    }
+  }
 
   drawLine("Informe de objetivos 2026", { size: 18, bold: true, spacing: 10 });
   drawLine(`Entidad: ${safeText(header.entity)}`);
