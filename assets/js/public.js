@@ -1,4 +1,4 @@
-const app = window.App || (window.App = {});
+var app = window.App || (window.App = {});
 const { getItemsExport, getInstructions, getWorkLines } = app.catalog;
 const {
   addSelection,

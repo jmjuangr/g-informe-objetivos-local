@@ -16,7 +16,7 @@ const showView = (hash) => {
   target.classList.add("active");
 };
 
-const app = window.App || (window.App = {});
+var app = window.App || (window.App = {});
 const publicUI = app.initPublic({ showToast });
 
 const handleRoute = () => {

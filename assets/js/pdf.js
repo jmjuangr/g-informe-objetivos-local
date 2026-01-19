@@ -1,4 +1,4 @@
-const app = window.App || (window.App = {});
+var app = window.App || (window.App = {});
 
 const generatePdf = async ({ header, selections }) => {
   if (!window.PDFLib) {
