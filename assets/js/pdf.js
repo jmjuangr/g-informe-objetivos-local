@@ -1,3 +1,4 @@
+(function () {
 var app = window.App || (window.App = {});
 
 const generatePdf = async ({ header, selections }) => {
@@ -88,3 +89,4 @@ const generatePdf = async ({ header, selections }) => {
 };
 
 app.pdf = { generatePdf };
+})();

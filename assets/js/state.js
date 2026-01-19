@@ -1,3 +1,4 @@
+(function () {
 var app = window.App || (window.App = {});
 
 const defaultState = () => ({
@@ -106,3 +107,4 @@ app.state = {
   importDraft,
   plazoOptions
 };
+})();

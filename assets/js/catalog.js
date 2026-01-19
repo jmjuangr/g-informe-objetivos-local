@@ -1,3 +1,4 @@
+(function () {
 var app = window.App || (window.App = {});
 const { dbApi } = app;
 
@@ -52,3 +53,4 @@ app.catalog = {
   getInstructions,
   getWorkLines
 };
+})();

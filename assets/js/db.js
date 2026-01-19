@@ -1,5 +1,6 @@
-var app = window.App || (window.App = {});
-const seedData = app.seedData;
+(function () {
+  var app = window.App || (window.App = {});
+  const seedData = app.seedData;
 
 const STORAGE_KEY = "catalog_db_v1";
 const SCHEMA_VERSION = 1;
@@ -140,6 +141,7 @@ const dbApi = {
   }
 };
 
-app.loadDb = loadDb;
-app.saveDb = saveDb;
-app.dbApi = dbApi;
+  app.loadDb = loadDb;
+  app.saveDb = saveDb;
+  app.dbApi = dbApi;
+})();

@@ -1,3 +1,4 @@
+(function () {
 var app = window.App || (window.App = {});
 const { getItemsExport, getInstructions, getWorkLines } = app.catalog;
 const {
@@ -546,3 +547,4 @@ const initPublic = ({ showToast }) => {
 };
 
 app.initPublic = initPublic;
+})();

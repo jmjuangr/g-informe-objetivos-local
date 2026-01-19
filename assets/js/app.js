@@ -1,3 +1,4 @@
+(function () {
 const toastEl = document.querySelector("#toast");
 
 const showToast = (message) => {
@@ -26,3 +27,4 @@ const handleRoute = () => {
 
 window.addEventListener("hashchange", handleRoute);
 handleRoute();
+})();
