@@ -1,4 +1,6 @@
-export const generatePdf = async ({ header, selections }) => {
+const app = window.App || (window.App = {});
+
+const generatePdf = async ({ header, selections }) => {
   if (!window.PDFLib) {
     throw new Error("La librería PDF no está disponible");
   }
@@ -84,3 +86,5 @@ export const generatePdf = async ({ header, selections }) => {
 
   return pdfDoc.save();
 };
+
+app.pdf = { generatePdf };

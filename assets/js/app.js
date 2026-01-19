@@ -1,8 +1,6 @@
-import { initPublic } from "./public.js";
-
 const toastEl = document.querySelector("#toast");
 
-export const showToast = (message) => {
+const showToast = (message) => {
   toastEl.textContent = message;
   toastEl.classList.add("show");
   setTimeout(() => toastEl.classList.remove("show"), 2500);
@@ -18,7 +16,8 @@ const showView = (hash) => {
   target.classList.add("active");
 };
 
-const publicUI = initPublic({ showToast });
+const app = window.App || (window.App = {});
+const publicUI = app.initPublic({ showToast });
 
 const handleRoute = () => {
   const hash = window.location.hash || "#/";

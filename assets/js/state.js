@@ -1,3 +1,5 @@
+const app = window.App || (window.App = {});
+
 const defaultState = () => ({
   header: {
     entity: "",
@@ -8,9 +10,9 @@ const defaultState = () => ({
 
 let reportState = defaultState();
 
-export const getReportState = () => structuredClone(reportState);
+const getReportState = () => structuredClone(reportState);
 
-export const setHeader = (payload) => {
+const setHeader = (payload) => {
   reportState = {
     ...reportState,
     header: {
@@ -20,11 +22,11 @@ export const setHeader = (payload) => {
   };
 };
 
-export const resetReport = () => {
+const resetReport = () => {
   reportState = defaultState();
 };
 
-export const addSelection = (item) => {
+const addSelection = (item) => {
   if (reportState.selections.some((entry) => entry.item_uuid === item.item_uuid)) {
     return;
   }
@@ -34,14 +36,14 @@ export const addSelection = (item) => {
   };
 };
 
-export const removeSelection = (itemUuid) => {
+const removeSelection = (itemUuid) => {
   reportState = {
     ...reportState,
     selections: reportState.selections.filter((entry) => entry.item_uuid !== itemUuid)
   };
 };
 
-export const setPlazo = (itemUuid, plazo) => {
+const setPlazo = (itemUuid, plazo) => {
   reportState = {
     ...reportState,
     selections: reportState.selections.map((entry) =>
@@ -50,7 +52,7 @@ export const setPlazo = (itemUuid, plazo) => {
   };
 };
 
-export const setObservations = (itemUuid, observations) => {
+const setObservations = (itemUuid, observations) => {
   reportState = {
     ...reportState,
     selections: reportState.selections.map((entry) =>
@@ -59,9 +61,9 @@ export const setObservations = (itemUuid, observations) => {
   };
 };
 
-export const exportDraft = () => JSON.stringify(getReportState(), null, 2);
+const exportDraft = () => JSON.stringify(getReportState(), null, 2);
 
-export const importDraft = (payload) => {
+const importDraft = (payload) => {
   if (!payload || typeof payload !== "object") {
     throw new Error("Formato de borrador inválido");
   }
@@ -84,10 +86,23 @@ export const importDraft = (payload) => {
   };
 };
 
-export const plazoOptions = [
+const plazoOptions = [
   "Primer trimestre",
   "Segundo trimestre",
   "Tercer trimestre",
   "Cuarto trimestre",
   "Año completo"
 ];
+
+app.state = {
+  getReportState,
+  setHeader,
+  resetReport,
+  addSelection,
+  removeSelection,
+  setPlazo,
+  setObservations,
+  exportDraft,
+  importDraft,
+  plazoOptions
+};

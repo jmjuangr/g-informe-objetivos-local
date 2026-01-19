@@ -1,4 +1,5 @@
-export const seedData = {
+window.App = window.App || {};
+window.App.seedData = {
   "schema_version": 1,
   "updated_at": new Date().toISOString(),
   "commissions": [

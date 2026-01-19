@@ -1,8 +1,9 @@
-import { dbApi } from "./db.js";
+const app = window.App || (window.App = {});
+const { dbApi } = app;
 
 const shortId = (id) => id?.slice(0, 8) || "";
 
-export const getItemsExport = () => {
+const getItemsExport = () => {
   const db = dbApi.loadDb();
   return db.items_objetivo.map((item) => {
     const instruction = db.instructions.find((entry) => entry.id === item.instruction_id);
@@ -29,7 +30,7 @@ export const getItemsExport = () => {
   });
 };
 
-export const getInstructions = () =>
+const getInstructions = () =>
   dbApi
     .instructions
     .list()
@@ -39,9 +40,15 @@ export const getInstructions = () =>
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-export const getWorkLines = () =>
+const getWorkLines = () =>
   dbApi
     .work_lines
     .list()
     .slice()
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+app.catalog = {
+  getItemsExport,
+  getInstructions,
+  getWorkLines
+};

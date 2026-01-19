@@ -1,5 +1,6 @@
-import { getItemsExport, getInstructions, getWorkLines } from "./catalog.js";
-import {
+const app = window.App || (window.App = {});
+const { getItemsExport, getInstructions, getWorkLines } = app.catalog;
+const {
   addSelection,
   exportDraft,
   getReportState,
@@ -9,8 +10,8 @@ import {
   setHeader,
   setObservations,
   setPlazo
-} from "./state.js";
-import { generatePdf } from "./pdf.js";
+} = app.state;
+const { generatePdf } = app.pdf;
 
 const buildOption = (value, label) => {
   const option = document.createElement("option");
@@ -19,7 +20,7 @@ const buildOption = (value, label) => {
   return option;
 };
 
-export const initPublic = ({ showToast }) => {
+const initPublic = ({ showToast }) => {
   const entityInput = document.querySelector("#header-entity");
   const managerInput = document.querySelector("#header-manager");
   const instructionSelect = document.querySelector("#filter-instruction");
@@ -543,3 +544,5 @@ export const initPublic = ({ showToast }) => {
 
   return { refresh };
 };
+
+app.initPublic = initPublic;

@@ -1,4 +1,5 @@
-import { seedData } from "./seed.js";
+const app = window.App || (window.App = {});
+const seedData = app.seedData;
 
 const STORAGE_KEY = "catalog_db_v1";
 const SCHEMA_VERSION = 1;
@@ -23,7 +24,7 @@ const emptyDb = () => ({
   items_objetivo: []
 });
 
-export const loadDb = () => {
+const loadDb = () => {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     const seeded = seedData ? structuredClone(seedData) : emptyDb();
@@ -46,7 +47,7 @@ export const loadDb = () => {
   }
 };
 
-export const saveDb = (db) => {
+const saveDb = (db) => {
   const payload = {
     ...db,
     schema_version: SCHEMA_VERSION,
@@ -92,7 +93,7 @@ const getEntity = (key, id) => loadDb()[key].find((entry) => entry.id === id) ||
 
 const listEntity = (key) => loadDb()[key];
 
-export const dbApi = {
+const dbApi = {
   loadDb,
   saveDb,
   commissions: {
@@ -138,3 +139,7 @@ export const dbApi = {
     remove: (id) => deleteEntity("items_objetivo", id)
   }
 };
+
+app.loadDb = loadDb;
+app.saveDb = saveDb;
+app.dbApi = dbApi;
