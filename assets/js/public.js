@@ -24,27 +24,61 @@ export const initPublic = ({ showToast }) => {
   const managerInput = document.querySelector("#header-manager");
   const instructionSelect = document.querySelector("#filter-instruction");
   const workLineSelect = document.querySelector("#filter-work-line");
-  const availableBody = document.querySelector("#available-items");
+  const availableContainer = document.querySelector("#available-items");
   const selectedBody = document.querySelector("#selected-items");
+  const addSelectedButton = document.querySelector("#add-selected");
   const exportButton = document.querySelector("#export-draft");
   const importInput = document.querySelector("#import-draft");
   const pdfButton = document.querySelector("#generate-pdf");
 
   let itemsExport = getItemsExport();
 
-  const renderFilters = () => {
-    instructionSelect.innerHTML = "";
+  const renderWorkLineOptions = (instructionId, preferredValue = "") => {
     workLineSelect.innerHTML = "";
+    workLineSelect.appendChild(buildOption("", "Todas"));
+    if (!instructionId) {
+      workLineSelect.disabled = true;
+      return;
+    }
 
+    const validLineIds = new Set(
+      itemsExport.filter((item) => item.instruction_uuid === instructionId).map((item) => item.work_line_uuid)
+    );
+    if (!validLineIds.size) {
+      workLineSelect.disabled = true;
+      return;
+    }
+
+    getWorkLines().forEach((workLine) => {
+      if (!validLineIds.has(workLine.id)) return;
+      workLineSelect.appendChild(
+        buildOption(workLine.id, `${workLine.code} - ${workLine.display_name}`)
+      );
+    });
+
+    workLineSelect.disabled = false;
+    if (preferredValue && validLineIds.has(preferredValue)) {
+      workLineSelect.value = preferredValue;
+    } else {
+      workLineSelect.value = "";
+    }
+  };
+
+  const renderFilters = () => {
+    const currentInstruction = instructionSelect.value;
+    const currentWorkLine = workLineSelect.value;
+
+    instructionSelect.innerHTML = "";
     instructionSelect.appendChild(buildOption("", "Todas"));
     getInstructions().forEach((instruction) => {
       instructionSelect.appendChild(buildOption(instruction.id, instruction.name));
     });
 
-    workLineSelect.appendChild(buildOption("", "Todas"));
-    getWorkLines().forEach((workLine) => {
-      workLineSelect.appendChild(buildOption(workLine.id, `${workLine.code} - ${workLine.display_name}`));
-    });
+    if (currentInstruction) {
+      instructionSelect.value = currentInstruction;
+    }
+
+    renderWorkLineOptions(instructionSelect.value, currentWorkLine);
   };
 
   const renderAvailable = () => {
@@ -60,30 +94,64 @@ export const initPublic = ({ showToast }) => {
       return true;
     });
 
-    availableBody.innerHTML = "";
+    availableContainer.innerHTML = "";
 
     if (!filtered.length) {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td colspan="5" class="muted">No hay ítems disponibles.</td>`;
-      availableBody.appendChild(row);
+      const message = document.createElement("p");
+      message.className = "muted";
+      message.textContent = "No hay ítems disponibles.";
+      availableContainer.appendChild(message);
       return;
     }
 
-    filtered.forEach((item) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.item_code}</td>
-        <td>${item.title}</td>
-        <td>${item.instruction}</td>
-        <td>${item.work_line}</td>
-        <td><button data-id="${item.item_uuid}" class="secondary">Añadir</button></td>
-      `;
-      row.querySelector("button").addEventListener("click", () => {
-        addSelection(item);
-        renderSelected();
-        renderAvailable();
+    const grouped = filtered.reduce((acc, item) => {
+      if (!acc.has(item.instruction_uuid)) {
+        acc.set(item.instruction_uuid, { label: item.instruction, items: [] });
+      }
+      acc.get(item.instruction_uuid).items.push(item);
+      return acc;
+    }, new Map());
+
+    grouped.forEach((group) => {
+      const details = document.createElement("details");
+      details.open = true;
+
+      const summary = document.createElement("summary");
+      summary.textContent = `${group.label} (${group.items.length})`;
+      details.appendChild(summary);
+
+      const content = document.createElement("div");
+      content.className = "accordion-content";
+
+      group.items.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "item-row";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.dataset.itemId = item.item_uuid;
+
+        const code = document.createElement("div");
+        code.className = "item-code";
+        code.textContent = item.item_code;
+
+        const title = document.createElement("div");
+        title.className = "item-title";
+        title.textContent = item.title;
+
+        const line = document.createElement("div");
+        line.className = "item-meta";
+        line.textContent = item.work_line;
+
+        row.appendChild(checkbox);
+        row.appendChild(code);
+        row.appendChild(title);
+        row.appendChild(line);
+        content.appendChild(row);
       });
-      availableBody.appendChild(row);
+
+      details.appendChild(content);
+      availableContainer.appendChild(details);
     });
   };
 
@@ -158,8 +226,34 @@ export const initPublic = ({ showToast }) => {
     setHeader({ manager: event.target.value });
   });
 
-  instructionSelect.addEventListener("change", renderAvailable);
+  instructionSelect.addEventListener("change", () => {
+    renderWorkLineOptions(instructionSelect.value);
+    renderAvailable();
+  });
   workLineSelect.addEventListener("change", renderAvailable);
+
+  addSelectedButton.addEventListener("click", () => {
+    const { selections } = getReportState();
+    const selectedIds = new Set(selections.map((entry) => entry.item_uuid));
+    const toAdd = [];
+    availableContainer.querySelectorAll("input[type=\"checkbox\"][data-item-id]").forEach((checkbox) => {
+      if (!checkbox.checked) return;
+      const item = itemsExport.find((entry) => entry.item_uuid === checkbox.dataset.itemId);
+      if (item && !selectedIds.has(item.item_uuid)) {
+        toAdd.push(item);
+      }
+    });
+
+    if (!toAdd.length) {
+      showToast("Selecciona al menos un ítem.");
+      return;
+    }
+
+    toAdd.forEach((item) => addSelection(item));
+    renderSelected();
+    renderAvailable();
+    showToast("Ítems añadidos.");
+  });
 
   exportButton.addEventListener("click", () => {
     const blob = new Blob([exportDraft()], { type: "application/json" });

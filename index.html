@@ -35,30 +35,20 @@
 
         <div class="card">
           <h3>Selección de ítems</h3>
-          <div class="grid">
+          <div class="filter-row">
             <label>
               Instrucción
               <select id="filter-instruction"></select>
             </label>
             <label>
               Línea de trabajo
-              <select id="filter-work-line"></select>
+              <select id="filter-work-line" disabled></select>
             </label>
+            <div class="filter-actions">
+              <button id="add-selected" class="secondary">Añadir seleccionados</button>
+            </div>
           </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Título</th>
-                  <th>Instrucción</th>
-                  <th>Línea</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="available-items"></tbody>
-            </table>
-          </div>
+          <div id="available-items" class="accordion"></div>
         </div>
 
         <div class="card">

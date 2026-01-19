@@ -69,6 +69,23 @@ body {
   margin-top: 12px;
 }
 
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: end;
+  margin-top: 12px;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.filter-actions button {
+  width: 100%;
+}
+
 label {
   display: flex;
   flex-direction: column;
@@ -148,6 +165,72 @@ button.secondary {
 
 .file-input input {
   display: none;
+}
+
+.accordion details {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  margin-top: 12px;
+}
+
+.accordion summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-content {
+  padding: 0 16px 12px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-title {
+  font-weight: 600;
+}
+
+.item-meta {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.item-code {
+  font-weight: 600;
+}
+
+@media (min-width: 720px) {
+  .item-row {
+    grid-template-columns: 24px 120px 1fr 220px;
+    align-items: center;
+  }
+
+  .item-title {
+    font-weight: 500;
+  }
+
+  .item-meta {
+    margin-top: 0;
+    font-size: 0.95rem;
+    color: #1f2937;
+  }
 }
 
 .toast {
