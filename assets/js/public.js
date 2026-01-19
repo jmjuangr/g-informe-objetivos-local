@@ -14,12 +14,56 @@ const {
 } = app.state;
 const { generatePdf } = app.pdf;
 
-const buildOption = (value, label) => {
-  const option = document.createElement("option");
-  option.value = value;
-  option.textContent = label;
-  return option;
-};
+  const buildOption = (value, label) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    return option;
+  };
+
+  const buildExportFilename = (entity, extension) => {
+    const safeEntity = String(entity || "")
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "");
+    return `informe_objetivos_2026_${safeEntity || "entidad"}.${extension}`;
+  };
+
+  const buildWorkLineSortMaps = () => {
+    const byId = new Map();
+    const byName = new Map();
+    getWorkLines().forEach((workLine, index) => {
+      const sortValue = Number.isFinite(workLine.sort_order) ? workLine.sort_order : index;
+      byId.set(workLine.id, sortValue);
+      byName.set(workLine.display_name, sortValue);
+    });
+    return { byId, byName };
+  };
+
+  const getWorkLineSortValue = (item, maps) => {
+    if (Number.isFinite(item.work_line_sort_order)) return item.work_line_sort_order;
+    if (item.work_line_uuid && maps.byId.has(item.work_line_uuid)) {
+      return maps.byId.get(item.work_line_uuid);
+    }
+    if (item.work_line && maps.byName.has(item.work_line)) {
+      return maps.byName.get(item.work_line);
+    }
+    return Number.MAX_SAFE_INTEGER;
+  };
+
+  const compareItemsByWorkLine = (a, b, maps) => {
+    const orderA = getWorkLineSortValue(a, maps);
+    const orderB = getWorkLineSortValue(b, maps);
+    if (orderA !== orderB) return orderA - orderB;
+    const codeA = String(a.work_line_code || "");
+    const codeB = String(b.work_line_code || "");
+    if (codeA !== codeB) return codeA.localeCompare(codeB);
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  };
 
 const initPublic = ({ showToast }) => {
   const entityInput = document.querySelector("#header-entity");
@@ -155,6 +199,7 @@ const initPublic = ({ showToast }) => {
     const selectedIds = new Set(selections.map((entry) => entry.item_uuid));
     const instructionFilter = instructionSelect.value;
     const workLineFilter = workLineSelect.value;
+    const workLineMaps = buildWorkLineSortMaps();
 
     const filtered = itemsExport.filter((item) => {
       if (selectedIds.has(item.item_uuid)) return false;
@@ -205,6 +250,7 @@ const initPublic = ({ showToast }) => {
       const content = document.createElement("div");
       content.className = "accordion-content";
 
+      group.items.sort((a, b) => compareItemsByWorkLine(a, b, workLineMaps));
       group.items.forEach((item) => {
         const row = document.createElement("div");
         row.className = "item-row";
@@ -212,10 +258,6 @@ const initPublic = ({ showToast }) => {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.itemId = item.item_uuid;
-
-        const code = document.createElement("div");
-        code.className = "item-code";
-        code.textContent = item.item_code;
 
         const title = document.createElement("div");
         title.className = "item-title";
@@ -235,7 +277,6 @@ const initPublic = ({ showToast }) => {
         });
 
         row.appendChild(checkbox);
-        row.appendChild(code);
         row.appendChild(title);
         row.appendChild(line);
         row.appendChild(addButton);
@@ -276,6 +317,7 @@ const initPublic = ({ showToast }) => {
     const workLineNameById = new Map(
       getWorkLines().map((workLine) => [workLine.id, workLine.display_name])
     );
+    const workLineMaps = buildWorkLineSortMaps();
 
     const filtered = selections.filter((item) => {
       if (instructionFilter) {
@@ -339,6 +381,7 @@ const initPublic = ({ showToast }) => {
       const content = document.createElement("div");
       content.className = "accordion-content";
 
+      group.items.sort((a, b) => compareItemsByWorkLine(a, b, workLineMaps));
       group.items.forEach((item) => {
         const row = document.createElement("div");
         row.className = "item-row selected-row";
@@ -346,10 +389,6 @@ const initPublic = ({ showToast }) => {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.dataset.itemId = item.item_uuid;
-
-        const code = document.createElement("div");
-        code.className = "item-code";
-        code.textContent = item.item_code;
 
         const title = document.createElement("div");
         title.className = "item-title";
@@ -381,7 +420,6 @@ const initPublic = ({ showToast }) => {
         });
 
         row.appendChild(checkbox);
-        row.appendChild(code);
         row.appendChild(title);
         row.appendChild(plazoSelect);
         row.appendChild(observationsInput);
@@ -496,14 +534,14 @@ const initPublic = ({ showToast }) => {
   exportButton.addEventListener("click", () => {
     const { header } = getReportState();
     if (!header.entity.trim() || !header.manager.trim()) {
-      showToast("Completa Entidad y Gestor antes de exportar.");
+      showToast("Completa Entidad y Gestor/a antes de exportar.");
       return;
     }
     const blob = new Blob([exportDraft()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "borrador-informe.json";
+    link.download = buildExportFilename(header.entity, "json");
     link.click();
     URL.revokeObjectURL(url);
     showToast("Borrador exportado.");
@@ -531,7 +569,7 @@ const initPublic = ({ showToast }) => {
       return;
     }
     if (!header.entity.trim() || !header.manager.trim()) {
-      showToast("Completa Entidad y Gestor antes de exportar.");
+      showToast("Completa Entidad y Gestor/a antes de exportar.");
       return;
     }
 
@@ -541,7 +579,7 @@ const initPublic = ({ showToast }) => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "informe-objetivos.pdf";
+      link.download = buildExportFilename(header.entity, "pdf");
       link.click();
       URL.revokeObjectURL(url);
       showToast("PDF generado.");

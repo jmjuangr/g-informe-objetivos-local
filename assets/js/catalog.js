@@ -26,7 +26,8 @@ const getItemsExport = () => {
       submatter: submatter?.name || "",
       work_line_uuid: workLine?.id || "",
       work_line_code: workLine?.code || "",
-      work_line: workLine?.display_name || ""
+      work_line: workLine?.display_name || "",
+      work_line_sort_order: workLine?.sort_order ?? null
     };
   });
 };

@@ -105,16 +105,28 @@ const generatePdf = async ({ header, selections }) => {
     return lines.length ? lines : [""];
   };
 
-  const drawWrappedRow = ({ title, plazo, observations, hasExtra }) => {
+  const drawSeparator = (spacing = 6) => {
+    page.drawLine({
+      start: { x: margin, y: cursorY + 2 },
+      end: { x: pageSize[0] - margin, y: cursorY + 2 },
+      thickness: 1,
+      color: rgb(0.85, 0.85, 0.85)
+    });
+    cursorY -= spacing;
+  };
+
+  const drawWrappedRow = ({ title, plazo, observations, hasExtra, rowIndex }) => {
     const size = 11;
     const lineHeight = size + 4;
     const usableWidth = pageSize[0] - margin * 2;
     const gutter = 12;
     const columnWidth = 170;
+    const bulletIndent = 12;
     const leftWidth = hasExtra ? usableWidth - columnWidth * 2 - gutter * 2 : usableWidth;
+    const leftTextWidth = Math.max(60, leftWidth - bulletIndent);
 
     const avgCharWidth = size * 0.55;
-    const leftMaxChars = Math.max(8, Math.floor(leftWidth / avgCharWidth));
+    const leftMaxChars = Math.max(8, Math.floor(leftTextWidth / avgCharWidth));
     const rightMaxChars = Math.max(8, Math.floor(columnWidth / avgCharWidth));
 
     const titleLines = wrapText(title, leftMaxChars);
@@ -125,10 +137,30 @@ const generatePdf = async ({ header, selections }) => {
     const rowHeight = rowLines * lineHeight;
     ensureSpace(rowHeight + 8);
 
+    if (rowIndex % 2 === 1) {
+      const textAscent = size * 0.8;
+      const textDescent = size * 0.2;
+      const bgPadding = 2;
+      const topY = cursorY + textAscent + bgPadding;
+      const bottomY = cursorY - (rowLines - 1) * lineHeight - textDescent - bgPadding;
+      page.drawRectangle({
+        x: margin,
+        y: bottomY,
+        width: usableWidth,
+        height: topY - bottomY,
+        color: rgb(0.97, 0.97, 0.97),
+        borderWidth: 0
+      });
+    }
+
     for (let i = 0; i < rowLines; i += 1) {
       const y = cursorY - i * lineHeight;
       const leftText = titleLines[i] || "";
-      page.drawText(leftText, { x: margin, y, size, font });
+      const textX = margin + bulletIndent;
+      if (i === 0) {
+        page.drawText("-", { x: margin, y, size, font });
+      }
+      page.drawText(leftText, { x: textX, y, size, font });
 
       if (hasExtra) {
         const plazoText = plazoLines[i] || "";
@@ -143,32 +175,72 @@ const generatePdf = async ({ header, selections }) => {
     cursorY -= rowHeight + 8;
   };
 
+  const compareItemsByWorkLine = (a, b) => {
+    const orderA = Number.isFinite(a.work_line_sort_order) ? a.work_line_sort_order : Number.MAX_SAFE_INTEGER;
+    const orderB = Number.isFinite(b.work_line_sort_order) ? b.work_line_sort_order : Number.MAX_SAFE_INTEGER;
+    if (orderA !== orderB) return orderA - orderB;
+    const codeA = safeText(a.work_line_code || "");
+    const codeB = safeText(b.work_line_code || "");
+    if (codeA !== codeB) return codeA.localeCompare(codeB);
+    const titleA = safeText(a.title || "");
+    const titleB = safeText(b.title || "");
+    return titleA.localeCompare(titleB);
+  };
 
+
+  const headerTitle = "Informe de objetivos 2026";
+  const headerTitleSize = 18;
+  let headerTitleDrawn = false;
 
   if (isFirstPage) {
     try {
+      const headerBandHeight = 70;
+      const headerTopY = pageSize[1] - margin;
+      const headerBottomY = headerTopY - headerBandHeight;
+      page.drawRectangle({
+        x: margin,
+        y: headerBottomY,
+        width: pageSize[0] - margin * 2,
+        height: headerBandHeight,
+        color: rgb(0.95, 0.95, 0.95),
+        borderWidth: 0
+      });
+
       const logoBytes = await loadBinary("assets/img/Gestiona-RGB.png");
       const logoImage = await pdfDoc.embedPng(logoBytes);
       const logoWidth = 90;
       const scale = logoWidth / logoImage.width;
       const logoHeight = logoImage.height * scale;
       const logoX = margin;
-      const logoY = pageSize[1] - margin - logoHeight;
+      const logoY = headerBottomY + (headerBandHeight - logoHeight) / 2;
       page.drawImage(logoImage, {
         x: logoX,
         y: logoY,
         width: logoWidth,
         height: logoHeight
       });
-      cursorY = Math.min(cursorY, logoY - 12);
+      const titleWidth = fontBold.widthOfTextAtSize(headerTitle, headerTitleSize);
+      const titleX = (pageSize[0] - titleWidth) / 2;
+      const titleY = logoY + (logoHeight - headerTitleSize) / 2;
+      page.drawText(headerTitle, {
+        x: titleX,
+        y: titleY,
+        size: headerTitleSize,
+        font: fontBold,
+        color: rgb(0, 0, 0)
+      });
+      cursorY = headerBottomY - 18;
+      headerTitleDrawn = true;
     } catch (error) {
       console.warn("No se pudo cargar el logo para el PDF.", error);
     }
   }
 
-  drawLine("Informe de objetivos 2026", { size: 18, bold: true, spacing: 10 });
+  if (!headerTitleDrawn) {
+    drawLine(headerTitle, { size: headerTitleSize, bold: true, spacing: 10 });
+  }
   drawLine(`Entidad: ${safeText(header.entity)}`);
-  drawLine(`Gestor: ${safeText(header.manager)}`);
+  drawLine(`Gestor/a: ${safeText(header.manager)}`);
   drawLine(" ");
 
   const grouped = selections.reduce((acc, item) => {
@@ -182,18 +254,20 @@ const generatePdf = async ({ header, selections }) => {
 
   Object.entries(grouped).forEach(([instruction, items]) => {
     ensureSpace(30);
-    drawLine(instruction, { size: 14, bold: true, spacing: 8 });
+    drawLine(instruction, { size: 14, bold: true, spacing: 6 });
+    drawSeparator(12);
 
-    items.forEach((item) => {
+    items.sort(compareItemsByWorkLine).forEach((item, index) => {
       const title = safeText(item.title);
       const plazo = safeText(item.plazo);
       const observations = safeText(item.observations);
       const hasExtra = Boolean(plazo || observations);
       drawWrappedRow({
-        title: `- ${title}`,
+        title,
         plazo: plazo ? `Plazo: ${plazo}` : "",
         observations: observations ? `Observaciones: ${observations}` : "",
-        hasExtra
+        hasExtra,
+        rowIndex: index
       });
     });
   });

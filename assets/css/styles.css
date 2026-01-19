@@ -15,9 +15,9 @@ body {
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 28px;
 }
 
 .site-header {
@@ -29,7 +29,7 @@ body {
 .header-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
 }
 
@@ -233,12 +233,12 @@ button.secondary {
 
 @media (min-width: 720px) {
   .item-row {
-    grid-template-columns: 24px 120px 1fr 220px auto;
+    grid-template-columns: 24px 1fr 220px auto;
     align-items: center;
   }
 
   .item-row.selected-row {
-    grid-template-columns: 24px 120px 1fr 180px 240px auto;
+    grid-template-columns: 24px 1fr 180px 240px auto;
   }
 
   .item-title {

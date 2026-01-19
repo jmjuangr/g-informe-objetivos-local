@@ -80,6 +80,10 @@ const importDraft = (payload) => {
           title: entry.title || "",
           instruction: entry.instruction || "",
           work_line: entry.work_line || "",
+          work_line_code: entry.work_line_code || "",
+          work_line_sort_order: Number.isFinite(entry.work_line_sort_order)
+            ? entry.work_line_sort_order
+            : null,
           plazo: entry.plazo || "",
           observations: entry.observations || ""
         }))
