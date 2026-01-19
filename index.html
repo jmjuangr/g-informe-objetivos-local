@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Informe de Objetivos 2026</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-content">
+        <h1>Informe de objetivos 2026</h1>
+        <nav class="nav">
+          <a href="#/">Generador</a>
+          <a href="#/login">Login admin</a>
+          <a href="#/admin">Administración</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="view-public" class="view">
+        <h2>Generador público</h2>
+        <div class="card">
+          <h3>Cabecera</h3>
+          <div class="grid">
+            <label>
+              Entidad
+              <input type="text" id="header-entity" placeholder="Nombre de la entidad" />
+            </label>
+            <label>
+              Gestor
+              <input type="text" id="header-manager" placeholder="Nombre del gestor" />
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Selección de ítems</h3>
+          <div class="grid">
+            <label>
+              Instrucción
+              <select id="filter-instruction"></select>
+            </label>
+            <label>
+              Línea de trabajo
+              <select id="filter-work-line"></select>
+            </label>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Título</th>
+                  <th>Instrucción</th>
+                  <th>Línea</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="available-items"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Ítems seleccionados</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Título</th>
+                  <th>Plazo</th>
+                  <th>Observaciones</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="selected-items"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="export-draft" class="secondary">Exportar borrador JSON</button>
+          <label class="file-input">
+            Importar borrador JSON
+            <input type="file" id="import-draft" accept="application/json" />
+          </label>
+          <button id="generate-pdf">Generar PDF</button>
+        </div>
+      </section>
+
+      <section id="view-login" class="view">
+        <h2>Login admin</h2>
+        <div class="card small">
+          <label>
+            Contraseña
+            <input type="password" id="admin-password" placeholder="Contraseña" />
+          </label>
+          <button id="admin-login">Entrar</button>
+          <p class="helper">Acceso local para editar el catálogo.</p>
+        </div>
+      </section>
+
+      <section id="view-admin" class="view">
+        <div class="admin-header">
+          <h2>Panel de administración</h2>
+          <button id="admin-logout" class="secondary">Cerrar sesión</button>
+        </div>
+
+        <div class="card">
+          <div class="grid">
+            <label>
+              Entidad
+              <select id="admin-entity"></select>
+            </label>
+            <label>
+              Buscar
+              <input type="search" id="admin-search" placeholder="Filtrar por texto" />
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 id="admin-form-title">Crear / editar</h3>
+          <form id="admin-form" class="grid"></form>
+          <div class="actions">
+            <button id="admin-save">Guardar</button>
+            <button id="admin-cancel" class="secondary" type="button">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Listado</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead id="admin-table-head"></thead>
+              <tbody id="admin-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="assets/vendor/pdf-lib.min.js"></script>
+    <script type="module" src="assets/js/app.js"></script>
+  </body>
+</html>
