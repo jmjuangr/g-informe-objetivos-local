@@ -494,6 +494,11 @@ const initPublic = ({ showToast }) => {
   });
 
   exportButton.addEventListener("click", () => {
+    const { header } = getReportState();
+    if (!header.entity.trim() || !header.manager.trim()) {
+      showToast("Completa Entidad y Gestor antes de exportar.");
+      return;
+    }
     const blob = new Blob([exportDraft()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -520,9 +525,13 @@ const initPublic = ({ showToast }) => {
   });
 
   pdfButton.addEventListener("click", async () => {
-    const { selections } = getReportState();
+    const { header, selections } = getReportState();
     if (!selections.length) {
       showToast("Selecciona al menos un ítem.");
+      return;
+    }
+    if (!header.entity.trim() || !header.manager.trim()) {
+      showToast("Completa Entidad y Gestor antes de exportar.");
       return;
     }
 

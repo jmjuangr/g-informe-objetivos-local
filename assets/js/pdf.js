@@ -48,14 +48,14 @@ const generatePdf = async ({ header, selections }) => {
   };
 
   const drawSeparator = () => {
-    const y = cursorY + 2;
+    const y = cursorY + 6;
     page.drawLine({
       start: { x: margin, y },
       end: { x: pageSize[0] - margin, y },
       color: separatorColor,
       thickness: separatorWidth
     });
-    cursorY -= 6;
+    cursorY -= 2;
   };
 
 
