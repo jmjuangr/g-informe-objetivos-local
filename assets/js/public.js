@@ -112,12 +112,25 @@ export const initPublic = ({ showToast }) => {
       return acc;
     }, new Map());
 
-    grouped.forEach((group) => {
+    grouped.forEach((group, instructionId) => {
       const details = document.createElement("details");
       details.open = true;
 
       const summary = document.createElement("summary");
-      summary.textContent = `${group.label} (${group.items.length})`;
+      const summaryContent = document.createElement("div");
+      summaryContent.className = "accordion-summary";
+
+      const summaryCheckbox = document.createElement("input");
+      summaryCheckbox.type = "checkbox";
+      summaryCheckbox.className = "instruction-select";
+      summaryCheckbox.dataset.instructionId = instructionId;
+
+      const summaryLabel = document.createElement("span");
+      summaryLabel.textContent = `${group.label} (${group.items.length})`;
+
+      summaryContent.appendChild(summaryCheckbox);
+      summaryContent.appendChild(summaryLabel);
+      summary.appendChild(summaryContent);
       details.appendChild(summary);
 
       const content = document.createElement("div");
@@ -148,6 +161,17 @@ export const initPublic = ({ showToast }) => {
         row.appendChild(title);
         row.appendChild(line);
         content.appendChild(row);
+      });
+
+      summaryCheckbox.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+
+      summaryCheckbox.addEventListener("change", (event) => {
+        const shouldCheck = event.target.checked;
+        content.querySelectorAll("input[type=\"checkbox\"][data-item-id]").forEach((checkbox) => {
+          checkbox.checked = shouldCheck;
+        });
       });
 
       details.appendChild(content);

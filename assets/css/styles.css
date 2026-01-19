@@ -181,6 +181,17 @@ button.secondary {
   list-style: none;
 }
 
+.accordion-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.instruction-select {
+  width: 16px;
+  height: 16px;
+}
+
 .accordion summary::-webkit-details-marker {
   display: none;
 }
