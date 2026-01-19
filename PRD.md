@@ -1,92 +1,114 @@
-# PRODUCT REQUIREMENTS DOCUMENT (PRD)
+# PRODUCT REQUIREMENTS DOCUMENT (PRD) — Modo Local Offline (index.html)
 
-## 1. Project Overview
-Aplicación web para la gestión y generación de informes estandarizados en formato PDF.
-El sistema permite a los **Administradores** configurar un catálogo de ítems jerarquizados (Comisiones, Instrucciones, Materias, etc.) y permite a **Usuarios Anónimos** generar archivos PDF seleccionando estos ítems e introduciendo metadatos de gestión (Entidad, Gestor, Plazo).
+## 0. Objetivo y restricción clave
+Esta aplicación DEBE poder ejecutarse **sin instalación** y **sin servidor**:
+- El usuario descarga un `.zip`, lo descomprime y abre `index.html` (doble click).
+- Debe funcionar **offline** (sin conexión a Internet).
+- No existe BBDD remota: toda la persistencia es local en el equipo del usuario.
 
-## 2. User Roles
+> Nota: en modo 100% client-side, “login admin” NO puede considerarse seguridad real frente a un atacante con acceso al equipo.
+> Se usa como “bloqueo de interfaz” para separar funciones y evitar cambios accidentales.
 
-### A. Administrador (Auth Required)
-- **Acceso:** Login vía Supabase Auth (Email/Password).
-- **Permisos:**
-  - Crear, Leer, Actualizar y Borrar (CRUD) los Ítems de Configuración.
-  - Gestionar la jerarquía de datos.
+---
 
-### B. Usuario General (Public/Anonymous)
-- **Acceso:** Sin autenticación (Ruta pública).
-- **Permisos:**
-  - Visualizar (Leer) los ítems configurados.
-  - Filtrar ítems por jerarquía.
-  - Generar y descargar el archivo PDF final.
-  - **Restricción:** No puede modificar la base de datos, solo leer para construir su archivo local.
+## 1. Visión general del producto
+Aplicación web para la **gestión y generación de informes estandarizados en PDF**:
 
-## 3. Core Features (MVP)
+- **Usuarios Anónimos (público)**: seleccionan ítems + introducen metadatos (Entidad, Gestor, Plazo por ítem) y generan un **PDF**.
 
-### 3.1. Panel de Administración (Protected)
-- **Tabla de Gestión:** Interfaz (shadcn/ui Data Table) para visualizar todos los ítems.
-- **Formulario de Ítem:**
-  - Campos: Comisión, Instrucción, Materia, Submateria, Línea de Trabajo, Objetivo, Estado, Año, Código heredado.
-  - Validaciones: Zod (campos requeridos).
+La generación del PDF es **100% client-side** (prohibido cualquier backend).
 
-### 3.2. Generador Público de Informes
-- **Entrada de Datos de Cabecera:**
-  - Entidad (Texto).
-  - Gestor (Texto).
+---
 
-- **Selector de Ítems:**
-  - Seleccion en cascada: primero se selecciona instruction, de ahi derivan las work_line y de las work_line derivan los item_objective.
-  - La tabla de items disponibles tiene boton "Añadir"; al añadir un item desaparece de la lista para evitar duplicados.
-  - Debajo se muestra la tabla de items seleccionados con boton "Quitar".
-  - Cada item_objective seleccionado debe tener un Plazo (Primer trimestre, Segundo trimestre, Tercer trimestre, Cuarto trimestre, Ano completo).
-  - Los item_objective se van acumulando en el informe, para luego exportarse.
-- **Borradores locales (client-side):**
-  - Exportar el estado del informe a JSON local (sin persistencia en BBDD).
-  - Importar un borrador JSON para continuar editando.
-- **Motor de Exportación:**
-  - Generación de PDF en el cliente (Client-side).
-  - El PDF mantiene la agrupacion por instruccion e incluye observaciones y plazo.
+## 2. Roles de usuario
 
-## 4. Database Schema (Supabase)
 
-### Tablas normalizadas
+### A) Usuario general (Público/Anónimo)
+- Acceso sin autenticación.
+- Permisos:
+  - Leer el catálogo configurado (desde almacenamiento local).
+  - Filtrar ítems por jerarquía y seleccionar ítems objetivo.
+  - Definir **plazo por ítem**.
+  - Exportar e importar borradores del informe en JSON.
+  - Generar y descargar el PDF.
 
-- `commissions` (id, name, created_at)
-- `instructions` (id, commission_id, name, created_at, legacy_instruction_id optional)
-- `matters` (id, instruction_id, name, created_at)
-- `submatters` (id, matter_id, name, created_at)
-- `work_lines` (id, code, display_name, sort_order, created_at)
-- `items_objetivo` (id, instruction_id, submatter_id, work_line_id, title, status, year, legacy_item_code, created_at)
+---
 
-### View de lectura (plana)
+## 3. Funcionalidades (MVP)
 
-- `v_items_export` con columnas para UI/PDF:
-  - item_uuid, item_code, title, status, year
-  - instruction_uuid, instruction, commission
-  - matter, submatter
-  - work_line_uuid, work_line_code, work_line
+### 3.1 Panel de Administración (zona “protegida” local)
+- Gestión del catálogo normalizado:
+  - Comisiones
+  - Instrucciones
+  - Materias
+  - Submaterias
+  - Líneas de trabajo
+  - Ítems objetivo
+- Formularios con validación:
+  - Campos requeridos.
+  - Año fijo: **2026** en `items_objetivo`.
+- Tabla de gestión:
+  - Listado, edición y borrado.
+  - Búsqueda simple (por texto).
+  - Ordenación mínima (por instrucción / línea / código).
 
-Relaciones:
+### 3.2 Generador público de informes
+- Cabecera:
+  - Entidad (texto)
+  - Gestor (texto)
 
-1 instruction tiene n work_lines
-1 work_line tiene n items_objetivo
+- Selector de ítems (cascada):
+  - Selección en cascada:
+    1) Instrucción
+    2) Línea de trabajo (derivada de la instrucción)
+    3) Ítems objetivo (derivados de la línea)
+  - Lista de disponibles con botón “Añadir”.
+  - Al añadir, el ítem desaparece de disponibles para evitar duplicados.
+  - Lista/tabla de seleccionados con botón “Quitar”.
+  - Cada ítem seleccionado exige “Plazo”:
+    - Primer trimestre, Segundo trimestre, Tercer trimestre, Cuarto trimestre, Año completo.
 
-Notas:
-- El plazo no se almacena en la tabla; se selecciona al exportar.
+- Borradores locales (client-side):
+  - Exportar el estado del informe a JSON (archivo descargable).
+  - Importar un borrador JSON (file picker) para continuar.
 
-**Row Level Security (RLS) Policies:**
-1. **Enable RLS.**
-2. **Policy Public Read:** `SELECT` allowed for `anon` role (true) sobre tablas de lectura y/o `v_items_export`.
-3. **Policy Admin Full:** `ALL` allowed for `authenticated` users only en tablas de escritura.
+- Exportación PDF (client-side):
+  - Generación y descarga local del PDF.
+  - Mantener agrupación por Instrucción (y dentro, por Línea de trabajo si aplica).
+  - Incluir Observaciones (si existe campo en UI) y el Plazo por ítem.
 
-## 5. Site Map & Routing
+---
 
-- `src/app/page.tsx` -> **Vista Pública.** Formulario de entrada (Entidad/Gestor) + Selección de Ítems + Botón "Exportar PDF".
-- `src/app/login/page.tsx` -> Formulario de acceso para admins.
-- `src/app/admin/dashboard/page.tsx` -> **Vista Privada.** CRUD de `items_objetivo`.
+## 4. Persistencia local (la “BBDD local”)
 
-## 6. UI/UX Guidelines (shadcn/ui)
+### 4.1 Estrategia elegida (recomendada para index.html sin servidor)
+Usar **localStorage** como almacenamiento persistente, guardando un único documento JSON versionado:
+- Es lo más compatible con ejecución `file://` (doble click).
+- Evita dependencias de APIs con restricciones por “secure context”.
 
-- **Input:** Formularios limpios usando `react-hook-form` + `zod`.
-- **Feedback:** `Toaster` para confirmar guardado de ítems o generación de PDF.
-- **Data Display:** `Table` component para el Admin Dashboard. `Card` o `Checkbox` list para la selección pública.
-- **Icons:** Lucide React para acciones (Download, Edit, Trash, Plus).
+> Si en el futuro el catálogo crece mucho, se puede migrar a IndexedDB, pero NO es necesario para el MVP.
+
+### 4.2 Formato del “documento DB”
+Clave localStorage: `catalog_db_v1`
+
+Estructura:
+```json
+{
+  "schema_version": 1,
+  "updated_at": "ISO_DATE",
+  "commissions": [{ "id": "uuid", "name": "..." }],
+  "instructions": [{ "id": "uuid", "commission_id": "uuid", "name": "...", "legacy_instruction_id": null }],
+  "matters": [{ "id": "uuid", "instruction_id": "uuid", "name": "..." }],
+  "submatters": [{ "id": "uuid", "matter_id": "uuid", "name": "..." }],
+  "work_lines": [{ "id": "uuid", "code": "...", "display_name": "...", "sort_order": 10 }],
+  "items_objetivo": [{
+    "id": "uuid",
+    "instruction_id": "uuid",
+    "submatter_id": "uuid",
+    "work_line_id": "uuid",
+    "title": "...",
+    "status": "...",
+    "year": 2026,
+    "legacy_item_code": null
+  }]
+}
