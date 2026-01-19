@@ -1,6 +1,7 @@
 # Informe de Objetivos 2026 (modo offline)
 
 Aplicación web 100% offline. Se ejecuta abriendo `index.html` desde un `.zip` descomprimido, sin servidores ni conexiones a Internet.
+El repositorio solo contiene archivos estáticos (HTML/CSS/JS) y no requiere Node.js ni dependencias externas para ejecutarse; se han eliminado los artefactos legacy de Next.js/Supabase.
 
 ## Uso
 
