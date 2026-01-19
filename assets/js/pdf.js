@@ -53,9 +53,6 @@ const generatePdf = async ({ header, selections }) => {
   const grouped = selections.reduce((acc, item) => {
     const instruction = safeText(item.instruction) || "Sin instrucción";
     if (!acc[instruction]) {
-      acc[instruction] = {};
-    }
-    if (!acc[instruction]) {
       acc[instruction] = [];
     }
     acc[instruction].push(item);
