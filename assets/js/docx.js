@@ -10,6 +10,7 @@ const generateDocx = async ({ header, selections }) => {
     AlignmentType,
     Document,
     HeadingLevel,
+    ImageRun,
     Packer,
     PageOrientation,
     Paragraph,
@@ -38,6 +39,24 @@ const generateDocx = async ({ header, selections }) => {
     return titleA.localeCompare(titleB);
   };
 
+  const base64ToBytes = (base64) => {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  };
+
+  const getLogoBytes = () => {
+    const base64 = window.App?.logoPngBase64;
+    if (!base64) {
+      return null;
+    }
+    return base64ToBytes(base64);
+  };
+
   const grouped = selections.reduce((acc, item) => {
     const instruction = safeText(item.instruction) || "Sin instrucción";
     if (!acc[instruction]) {
@@ -49,13 +68,48 @@ const generateDocx = async ({ header, selections }) => {
 
   const children = [];
 
-  children.push(
-    new Paragraph({
-      text: "Informe de objetivos 2026",
-      heading: HeadingLevel.HEADING_1,
-      alignment: AlignmentType.CENTER
-    })
-  );
+  const logoBytes = getLogoBytes();
+  if (logoBytes) {
+    const logo = new ImageRun({
+      data: logoBytes,
+      transformation: {
+        height: 36,
+        width: 120
+      }
+    });
+    const headerTable = new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({
+              width: { size: 20, type: WidthType.PERCENTAGE },
+              children: [new Paragraph({ children: [logo] })]
+            }),
+            new TableCell({
+              width: { size: 80, type: WidthType.PERCENTAGE },
+              children: [
+                new Paragraph({
+                  text: "Informe de objetivos 2026",
+                  heading: HeadingLevel.HEADING_1,
+                  alignment: AlignmentType.CENTER
+                })
+              ]
+            })
+          ]
+        })
+      ]
+    });
+    children.push(headerTable);
+  } else {
+    children.push(
+      new Paragraph({
+        text: "Informe de objetivos 2026",
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER
+      })
+    );
+  }
 
   children.push(
     new Paragraph({
