@@ -11,7 +11,9 @@ El repositorio solo contiene archivos estáticos (HTML/CSS/JS) y no requiere Nod
 
 ## Persistencia local
 
-El catálogo se guarda en `localStorage` bajo la clave `catalog_db_v1` (schema_version 2); el estado en ejecución vive en memoria y los borradores del informe se gestionan mediante exportación/importación JSON. Para reiniciar el catálogo:
+El catálogo se guarda en `localStorage` bajo la clave `catalog_db_v1` (schema_version 2); el estado en ejecución vive en memoria y los borradores del informe se gestionan mediante exportación/importación JSON. Las traducciones se sincronizan automáticamente al abrir la app cuando cambia `seed_version`.
+
+Para reiniciar el catálogo:
 
 1. Abre las herramientas del navegador.
 2. Borra la clave `catalog_db_v1` en el almacenamiento local.

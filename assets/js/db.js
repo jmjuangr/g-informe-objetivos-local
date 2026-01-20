@@ -4,6 +4,7 @@
 
 const STORAGE_KEY = "catalog_db_v1";
 const SCHEMA_VERSION = 2;
+const SEED_VERSION = seedData?.seed_version ?? null;
 
 const entityKeys = [
   "commissions",
@@ -16,6 +17,7 @@ const entityKeys = [
 
 const emptyDb = () => ({
   schema_version: SCHEMA_VERSION,
+  seed_version: SEED_VERSION,
   updated_at: new Date().toISOString(),
   commissions: [],
   instructions: [],
@@ -41,10 +43,15 @@ const loadDb = () => {
       return migrated;
     }
     const normalized = normalizeDb(parsed);
+    const needsSeedUpdate = SEED_VERSION !== normalized.seed_version;
     const enriched = applyI18nFromSeed(normalized);
-    if (enriched.changed) {
-      saveDb(enriched.db);
-      return enriched.db;
+    if (needsSeedUpdate || enriched.changed) {
+      const updated = {
+        ...enriched.db,
+        seed_version: SEED_VERSION
+      };
+      saveDb(updated);
+      return updated;
     }
     return normalized;
   } catch (error) {
@@ -120,7 +127,10 @@ const applyI18nFromSeed = (db) => {
 
 const migrateDb = (db) => {
   const normalized = normalizeDb({ ...emptyDb(), ...db, schema_version: SCHEMA_VERSION });
-  return applyI18nFromSeed(normalized).db;
+  return {
+    ...applyI18nFromSeed(normalized).db,
+    seed_version: SEED_VERSION
+  };
 };
 
 const updateEntity = (key, item) => {

@@ -32,7 +32,7 @@ const generatePdf = async ({ header, selections }) => {
       xhr.open("GET", url, true);
       xhr.responseType = "arraybuffer";
       xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
+        if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.response)) {
           resolve(new Uint8Array(xhr.response));
         } else {
           reject(new Error(`No se pudo cargar ${url}`));
@@ -208,9 +208,9 @@ const generatePdf = async ({ header, selections }) => {
 
       const logoBytes = await loadBinary("assets/img/Gestiona-RGB.png");
       const logoImage = await pdfDoc.embedPng(logoBytes);
-      const logoWidth = 90;
-      const scale = logoWidth / logoImage.width;
-      const logoHeight = logoImage.height * scale;
+      const logoHeight = 36;
+      const scale = logoHeight / logoImage.height;
+      const logoWidth = logoImage.width * scale;
       const logoX = margin;
       const logoY = headerBottomY + (headerBandHeight - logoHeight) / 2;
       page.drawImage(logoImage, {
@@ -219,9 +219,8 @@ const generatePdf = async ({ header, selections }) => {
         width: logoWidth,
         height: logoHeight
       });
-      const titleWidth = fontBold.widthOfTextAtSize(headerTitle, headerTitleSize);
-      const titleX = (pageSize[0] - titleWidth) / 2;
-      const titleY = logoY + (logoHeight - headerTitleSize) / 2;
+      const titleX = logoX + logoWidth + 16;
+      const titleY = headerBottomY + (headerBandHeight - headerTitleSize) / 2;
       page.drawText(headerTitle, {
         x: titleX,
         y: titleY,
