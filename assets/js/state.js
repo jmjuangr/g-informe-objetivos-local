@@ -12,7 +12,8 @@ const defaultState = () => ({
 });
 
 let reportState = defaultState();
-let uiLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "es";
+let uiLanguage = "es";
+localStorage.setItem(LANGUAGE_STORAGE_KEY, uiLanguage);
 
 const getReportState = () => structuredClone(reportState);
 
