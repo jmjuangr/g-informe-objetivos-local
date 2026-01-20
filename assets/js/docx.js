@@ -8,16 +8,19 @@ const generateDocx = async ({ header, selections }) => {
 
   const {
     AlignmentType,
+    BorderStyle,
     Document,
-    HeadingLevel,
+    HeightRule,
     ImageRun,
     Packer,
     PageOrientation,
     Paragraph,
+    ShadingType,
     Table,
     TableCell,
     TableRow,
     TextRun,
+    VerticalAlign,
     WidthType
   } = window.docx;
 
@@ -67,6 +70,25 @@ const generateDocx = async ({ header, selections }) => {
   }, {});
 
   const children = [];
+  const tableBorders = {
+    top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+  };
+
+  const headerTitle = new Paragraph({
+    alignment: AlignmentType.CENTER,
+    children: [
+      new TextRun({
+        text: "Informe de objetivos 2026",
+        bold: true,
+        size: 36
+      })
+    ]
+  });
 
   const logoBytes = getLogoBytes();
   if (logoBytes) {
@@ -79,22 +101,24 @@ const generateDocx = async ({ header, selections }) => {
     });
     const headerTable = new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: tableBorders,
       rows: [
         new TableRow({
+          height: { value: 500, rule: HeightRule.ATLEAST },
           children: [
             new TableCell({
               width: { size: 20, type: WidthType.PERCENTAGE },
+              verticalAlign: VerticalAlign.CENTER,
+              shading: { type: ShadingType.CLEAR, color: "auto", fill: "F2F2F2" },
+              margins: { top: 120, bottom: 120, left: 120, right: 120 },
               children: [new Paragraph({ children: [logo] })]
             }),
             new TableCell({
               width: { size: 80, type: WidthType.PERCENTAGE },
-              children: [
-                new Paragraph({
-                  text: "Informe de objetivos 2026",
-                  heading: HeadingLevel.HEADING_1,
-                  alignment: AlignmentType.CENTER
-                })
-              ]
+              verticalAlign: VerticalAlign.CENTER,
+              shading: { type: ShadingType.CLEAR, color: "auto", fill: "F2F2F2" },
+              margins: { top: 120, bottom: 120, left: 120, right: 120 },
+              children: [headerTitle]
             })
           ]
         })
@@ -102,23 +126,17 @@ const generateDocx = async ({ header, selections }) => {
     });
     children.push(headerTable);
   } else {
-    children.push(
-      new Paragraph({
-        text: "Informe de objetivos 2026",
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER
-      })
-    );
+    children.push(headerTitle);
   }
 
   children.push(
     new Paragraph({
-      children: [new TextRun({ text: `Entidad: ${safeText(header.entity)}` })]
+      children: [new TextRun({ text: `Entidad: ${safeText(header.entity)}`, size: 22 })]
     })
   );
   children.push(
     new Paragraph({
-      children: [new TextRun({ text: `Gestor/a: ${safeText(header.manager)}` })]
+      children: [new TextRun({ text: `Gestor/a: ${safeText(header.manager)}`, size: 22 })]
     })
   );
   children.push(new Paragraph({ text: " " }));
@@ -126,26 +144,51 @@ const generateDocx = async ({ header, selections }) => {
   Object.entries(grouped).forEach(([instruction, items]) => {
     children.push(
       new Paragraph({
-        text: instruction,
-        heading: HeadingLevel.HEADING_2
+        children: [
+          new TextRun({
+            text: instruction,
+            bold: true,
+            size: 28
+          })
+        ],
+        spacing: { after: 120 }
       })
     );
 
-    const rows = items.sort(compareItemsByWorkLine).map((item) => {
+    const rows = items.sort(compareItemsByWorkLine).map((item, index) => {
       const plazo = safeText(item.plazo);
       const observations = safeText(item.observations);
+      const rowShade = index % 2 === 1 ? "F7F7F7" : null;
 
       const titleCell = new TableCell({
         width: { size: 60, type: WidthType.PERCENTAGE },
-        children: [new Paragraph(safeText(item.title))]
+        shading: rowShade ? { type: ShadingType.CLEAR, color: "auto", fill: rowShade } : undefined,
+        margins: { top: 120, bottom: 120, left: 120, right: 120 },
+        children: [
+          new Paragraph({
+            children: [new TextRun({ text: safeText(item.title), size: 22 })]
+          })
+        ]
       });
       const plazoCell = new TableCell({
         width: { size: 20, type: WidthType.PERCENTAGE },
-        children: [new Paragraph(plazo ? `Plazo: ${plazo}` : "")]
+        shading: rowShade ? { type: ShadingType.CLEAR, color: "auto", fill: rowShade } : undefined,
+        margins: { top: 120, bottom: 120, left: 120, right: 120 },
+        children: [
+          new Paragraph({
+            children: [new TextRun({ text: plazo ? `Plazo: ${plazo}` : "", size: 22 })]
+          })
+        ]
       });
       const obsCell = new TableCell({
         width: { size: 20, type: WidthType.PERCENTAGE },
-        children: [new Paragraph(observations ? `Observaciones: ${observations}` : "")]
+        shading: rowShade ? { type: ShadingType.CLEAR, color: "auto", fill: rowShade } : undefined,
+        margins: { top: 120, bottom: 120, left: 120, right: 120 },
+        children: [
+          new Paragraph({
+            children: [new TextRun({ text: observations ? `Observaciones: ${observations}` : "", size: 22 })]
+          })
+        ]
       });
 
       return new TableRow({
@@ -156,6 +199,7 @@ const generateDocx = async ({ header, selections }) => {
     children.push(
       new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: tableBorders,
         rows
       })
     );
@@ -164,6 +208,16 @@ const generateDocx = async ({ header, selections }) => {
   });
 
   const doc = new Document({
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: "Helvetica",
+            size: 22
+          }
+        }
+      }
+    },
     sections: [
       {
         properties: {
