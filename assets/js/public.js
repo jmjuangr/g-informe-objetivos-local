@@ -16,6 +16,7 @@ const {
   syncSelectionsFromCatalog
 } = app.state;
 const { generatePdf } = app.pdf;
+const { generateDocx } = app.docx;
 
   const buildOption = (value, label) => {
     const option = document.createElement("option");
@@ -84,6 +85,7 @@ const initPublic = ({ showToast }) => {
   const clearSelectedFiltersButton = document.querySelector("#clear-selected-filters");
   const exportButton = document.querySelector("#export-draft");
   const importInput = document.querySelector("#import-draft");
+  const docxButton = document.querySelector("#export-docx");
   const pdfButton = document.querySelector("#generate-pdf");
 
   let currentLanguage = getLanguage();
@@ -582,6 +584,31 @@ const initPublic = ({ showToast }) => {
       showToast("No se pudo importar el borrador.");
     } finally {
       event.target.value = "";
+    }
+  });
+
+  docxButton.addEventListener("click", async () => {
+    const { header, selections } = getReportState();
+    if (!selections.length) {
+      showToast("Selecciona al menos un ítem.");
+      return;
+    }
+    if (!header.entity.trim() || !header.manager.trim()) {
+      showToast("Completa Entidad y Gestor/a antes de exportar.");
+      return;
+    }
+
+    try {
+      const blob = await generateDocx(getReportState());
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = buildExportFilename(header.entity, "docx");
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("Word generado.");
+    } catch (error) {
+      showToast("No se pudo generar el Word.");
     }
   });
 

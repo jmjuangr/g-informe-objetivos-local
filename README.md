@@ -30,6 +30,10 @@ La migración de schema_version 1 a 2 añade traducciones (`*_i18n`) desde los d
 
 El PDF se genera 100% en el navegador usando una librería local (sin dependencias remotas), agrupado por instrucción y línea de trabajo.
 
+## Word (.docx)
+
+La exportación a Word se genera 100% en el navegador usando librerías locales, en formato apaisado y con el mismo contenido que el PDF.
+
 ## Estructura principal
 
 ```

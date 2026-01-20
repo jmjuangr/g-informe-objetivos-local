@@ -88,6 +88,7 @@
             Importar borrador JSON
             <input type="file" id="import-draft" accept="application/json" />
           </label>
+          <button id="export-docx" class="secondary">Exportar Word (.docx)</button>
           <button id="generate-pdf">Generar PDF</button>
         </div>
       </section>
@@ -97,12 +98,15 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="assets/vendor/pdf-lib.min.js"></script>
+    <script src="assets/vendor/jszip.min.js"></script>
+    <script src="assets/vendor/index.umd.cjs"></script>
     <script src="assets/js/seed.js"></script>
     <script src="assets/js/logo.js"></script>
     <script src="assets/js/db.js"></script>
     <script src="assets/js/catalog.js"></script>
     <script src="assets/js/state.js"></script>
     <script src="assets/js/pdf.js"></script>
+    <script src="assets/js/docx.js"></script>
     <script src="assets/js/public.js"></script>
     <script src="assets/js/app.js"></script>
   </body>
