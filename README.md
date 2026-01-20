@@ -11,11 +11,13 @@ El repositorio solo contiene archivos estáticos (HTML/CSS/JS) y no requiere Nod
 
 ## Persistencia local
 
-El catálogo se guarda en `localStorage` bajo la clave `catalog_db_v1`. Para reiniciar el catálogo:
+El catálogo se guarda en `localStorage` bajo la clave `catalog_db_v1` (schema_version 2); el estado en ejecución vive en memoria y los borradores del informe se gestionan mediante exportación/importación JSON. Para reiniciar el catálogo:
 
 1. Abre las herramientas del navegador.
 2. Borra la clave `catalog_db_v1` en el almacenamiento local.
 3. Recarga `index.html`.
+
+La migración de schema_version 1 a 2 añade traducciones (`*_i18n`) desde los datos seed cuando estén disponibles.
 
 ## Borradores JSON
 

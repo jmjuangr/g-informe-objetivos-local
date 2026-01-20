@@ -3,7 +3,7 @@
   const seedData = app.seedData;
 
 const STORAGE_KEY = "catalog_db_v1";
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 const entityKeys = [
   "commissions",
@@ -40,7 +40,13 @@ const loadDb = () => {
       saveDb(migrated);
       return migrated;
     }
-    return normalizeDb(parsed);
+    const normalized = normalizeDb(parsed);
+    const enriched = applyI18nFromSeed(normalized);
+    if (enriched.changed) {
+      saveDb(enriched.db);
+      return enriched.db;
+    }
+    return normalized;
   } catch (error) {
     const fresh = seedData ? structuredClone(seedData) : emptyDb();
     saveDb(fresh);
@@ -65,8 +71,56 @@ const normalizeDb = (db) => {
   return normalized;
 };
 
+const applyI18nFromSeed = (db) => {
+  if (!seedData) {
+    return { db, changed: false };
+  }
+
+  let changed = false;
+  const seedInstructions = new Map((seedData.instructions || []).map((item) => [item.id, item]));
+  const seedWorkLines = new Map((seedData.work_lines || []).map((item) => [item.id, item]));
+  const seedItems = new Map((seedData.items_objetivo || []).map((item) => [item.id, item]));
+
+  const mergeI18n = (list, seedMap, field) =>
+    list.map((item) => {
+      const seed = seedMap.get(item.id);
+      const seedI18n = seed?.[field];
+      if (!seedI18n) return item;
+      if (item[field] && typeof item[field] === "object") {
+        const merged = { ...seedI18n, ...item[field] };
+        const hasDiff = JSON.stringify(merged) !== JSON.stringify(item[field]);
+        if (hasDiff) {
+          changed = true;
+          return { ...item, [field]: merged };
+        }
+        return item;
+      }
+      changed = true;
+      return { ...item, [field]: { ...seedI18n } };
+    });
+
+  const instructions = mergeI18n(db.instructions, seedInstructions, "name_i18n");
+  const work_lines = mergeI18n(db.work_lines, seedWorkLines, "display_name_i18n");
+  const items_objetivo = mergeI18n(db.items_objetivo, seedItems, "title_i18n");
+
+  if (!changed) {
+    return { db, changed: false };
+  }
+
+  return {
+    db: {
+      ...db,
+      instructions,
+      work_lines,
+      items_objetivo
+    },
+    changed: true
+  };
+};
+
 const migrateDb = (db) => {
-  return normalizeDb({ ...emptyDb(), ...db, schema_version: SCHEMA_VERSION });
+  const normalized = normalizeDb({ ...emptyDb(), ...db, schema_version: SCHEMA_VERSION });
+  return applyI18nFromSeed(normalized).db;
 };
 
 const updateEntity = (key, item) => {
