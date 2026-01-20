@@ -26,21 +26,23 @@ const generatePdf = async ({ header, selections }) => {
   let cursorY = pageSize[1] - margin;
   let isFirstPage = true;
 
-  const loadBinary = (url) =>
-    new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", url, true);
-      xhr.responseType = "arraybuffer";
-      xhr.onload = () => {
-        if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.response)) {
-          resolve(new Uint8Array(xhr.response));
-        } else {
-          reject(new Error(`No se pudo cargar ${url}`));
-        }
-      };
-      xhr.onerror = () => reject(new Error(`No se pudo cargar ${url}`));
-      xhr.send();
-    });
+  const base64ToBytes = (base64) => {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  };
+
+  const getLogoBytes = () => {
+    const base64 = window.App?.logoPngBase64;
+    if (!base64) {
+      throw new Error("Logo embebido no disponible");
+    }
+    return base64ToBytes(base64);
+  };
 
   const drawLine = (text, options = {}) => {
     const size = options.size || 12;
@@ -206,7 +208,7 @@ const generatePdf = async ({ header, selections }) => {
         borderWidth: 0
       });
 
-      const logoBytes = await loadBinary("assets/img/Gestiona-RGB.png");
+      const logoBytes = getLogoBytes();
       const logoImage = await pdfDoc.embedPng(logoBytes);
       const logoHeight = 36;
       const scale = logoHeight / logoImage.height;
