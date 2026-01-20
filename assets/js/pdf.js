@@ -221,7 +221,10 @@ const generatePdf = async ({ header, selections }) => {
         width: logoWidth,
         height: logoHeight
       });
-      const titleX = logoX + logoWidth + 16;
+      const titleWidth = fontBold.widthOfTextAtSize(headerTitle, headerTitleSize);
+      const centeredTitleX = (pageSize[0] - titleWidth) / 2;
+      const minTitleX = logoX + logoWidth + 16;
+      const titleX = Math.max(centeredTitleX, minTitleX);
       const titleY = headerBottomY + (headerBandHeight - headerTitleSize) / 2;
       page.drawText(headerTitle, {
         x: titleX,

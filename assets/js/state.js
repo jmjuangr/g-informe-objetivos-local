@@ -142,7 +142,7 @@ const plazoOptions = [
   "Segundo trimestre",
   "Tercer trimestre",
   "Cuarto trimestre",
-  "Año completo"
+  "Pendiente de fecha"
 ];
 
 app.state = {
