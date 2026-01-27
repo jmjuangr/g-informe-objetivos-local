@@ -20,6 +20,7 @@ Para reiniciar el catálogo:
 3. Recarga `index.html`.
 
 La migración de schema_version 1 a 2 añade traducciones (`*_i18n`) desde los datos seed cuando estén disponibles.
+Los vendors locales han sido ajustados para evitar ejecución dinámica (`eval`/`Function`), manteniendo el funcionamiento 100% offline.
 
 ## Borradores JSON
 

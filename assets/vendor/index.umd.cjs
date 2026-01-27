@@ -2646,7 +2646,9 @@ var __async = (__this, __arguments, generator) => {
       for (var i = 0; i < boundLength; i++) {
         boundArgs[i] = "$" + i;
       }
-      bound = Function("binder", "return function (" + joiny(boundArgs, ",") + "){ return binder.apply(this,arguments); }")(binder);
+      bound = function() {
+        return binder.apply(this, arguments);
+      };
       if (target.prototype) {
         var Empty = function Empty2() {
         };
@@ -2805,10 +2807,7 @@ var __async = (__this, __arguments, generator) => {
     var sign2 = /* @__PURE__ */ requireSign();
     var $Function = Function;
     var getEvalledConstructor = function(expressionSyntax) {
-      try {
-        return $Function('"use strict"; return (' + expressionSyntax + ").constructor;")();
-      } catch (e) {
-      }
+      return void 0;
     };
     var $gOPD = /* @__PURE__ */ requireGopd();
     var $defineProperty = /* @__PURE__ */ requireEsDefineProperty();
@@ -3327,13 +3326,7 @@ var __async = (__this, __arguments, generator) => {
     var hasToStringTag = requireShams()();
     var getProto2 = Object.getPrototypeOf;
     var getGeneratorFunc = function() {
-      if (!hasToStringTag) {
-        return false;
-      }
-      try {
-        return Function("return function*() {}")();
-      } catch (e) {
-      }
+      return false;
     };
     var GeneratorFunction;
     isGeneratorFunction = function isGeneratorFunction2(fn) {
@@ -20124,7 +20117,7 @@ var __async = (__this, __arguments, generator) => {
                 }) : function(e4) {
                   setTimeout(c, 0, e4);
                 }, e3.setImmediate = function(e4) {
-                  "function" != typeof e4 && (e4 = new Function("" + e4));
+                  if ("function" != typeof e4) throw new TypeError("setImmediate expects a function");
                   for (var t3 = new Array(arguments.length - 1), r3 = 0; r3 < t3.length; r3++) t3[r3] = arguments[r3 + 1];
                   var n2 = { callback: e4, args: t3 };
                   return h[o] = n2, i(o), o++;
