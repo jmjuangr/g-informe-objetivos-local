@@ -2141,7 +2141,7 @@ window.App.seedData = {
       "instruction_id": "i3",
       "submatter_id": "s9",
       "work_line_id": "w2",
-      "title": "Cofigurar copia auténtica (permisos y carpetas de digitalización)",
+      "title": "Configurar copia auténtica (permisos y carpetas de digitalización)",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_173",
@@ -2717,15 +2717,15 @@ window.App.seedData = {
       "instruction_id": "i2",
       "submatter_id": "s21",
       "work_line_id": "w7",
-      "title": "Uso plantillas de espúblico",
+      "title": "Uso plantillas de esPublico",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_229",
       "title_i18n": {
-        "eu": "Populazio-txantiloiak erabiltzea",
-        "gl": "Uso persoais de espúblico",
-        "ca": "Ús plantilles de espúblico",
-        "va": "Ús plantilles de espúblico"
+        "eu": "esPublico txantiloiak erabiltzea",
+        "gl": "Uso persoais de esPublico",
+        "ca": "Ús plantilles de esPublico",
+        "va": "Ús plantilles de esPublico"
       }
     },
     {
@@ -2957,15 +2957,15 @@ window.App.seedData = {
       "instruction_id": "i2",
       "submatter_id": "s40",
       "work_line_id": "w7",
-      "title": "Publicar en en tablón",
+      "title": "Publicar en el tablón",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_249",
       "title_i18n": {
-        "eu": "Oholean argitaratzea",
-        "gl": "Publicar en en taboleiro",
-        "ca": "Publicar en en tauló",
-        "va": "Publicar en en tauló"
+        "eu": "Iragarki-taulan argitaratzea",
+        "gl": "Publicar no taboleiro",
+        "ca": "Publicar en el tauló",
+        "va": "Publicar en el tauló"
       }
     },
     {
@@ -3021,15 +3021,15 @@ window.App.seedData = {
       "instruction_id": "i1",
       "submatter_id": "s41",
       "work_line_id": "w3",
-      "title": "Solicitar el alta de la integración con el Tablón Edictal ünico del BOE (todas las entidades)",
+      "title": "Solicitar el alta de la integración con el Tablón Edictal Único del BOE (todas las entidades)",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_256",
       "title_i18n": {
-        "eu": "Integrazioaren alta eskatzea BOEko ediktu-oholean (erakunde guztiak)",
-        "gl": "Solicitar o alta da integración co Taboleiro Edictal ünico do BOE (todas as entidades)",
-        "ca": "Sol·licitar l'alta de la integració amb el Tauló Edictal ünico del BOE (totes les entitats)",
-        "va": "Sol·licitar l'alta de la integració amb el Tauló Edictal ünico del BOE (totes les entitats)"
+        "eu": "BOEko ediktu-taula bakarreko integrazioaren alta eskatzea (erakunde guztiak)",
+        "gl": "Solicitar o alta da integración co Taboleiro Edictal Único do BOE (todas as entidades)",
+        "ca": "Sol·licitar l'alta de la integració amb el Tauló Edictal Únic del BOE (totes les entitats)",
+        "va": "Sol·licitar l'alta de la integració amb el Tauló Edictal Únic del BOE (totes les entitats)"
       }
     },
     {
@@ -3117,15 +3117,15 @@ window.App.seedData = {
       "instruction_id": "i3",
       "submatter_id": "s13",
       "work_line_id": "w6",
-      "title": "Pesonalización de categorías tablón de anuncios",
+      "title": "Personalización de categorías tablón de anuncios",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_261",
       "title_i18n": {
-        "eu": "Iragarki-taulen kategorien pesonalizazioa",
-        "gl": "Pesonalización de categorías taboleiro de anuncios",
-        "ca": "Pesonalización de categories tauler d'anuncis",
-        "va": "Pesonalización de categories tauler d'anuncis"
+        "eu": "Iragarki-taulen kategoriak pertsonalizatzea",
+        "gl": "Personalización de categorías taboleiro de anuncios",
+        "ca": "Personalització de categories tauler d'anuncis",
+        "va": "Personalització de categories tauler d'anuncis"
       }
     },
     {
@@ -3133,15 +3133,15 @@ window.App.seedData = {
       "instruction_id": "i3",
       "submatter_id": "s13",
       "work_line_id": "w6",
-      "title": "Configurar nueva imagen sede electrónica ( colores personalizados, banner y banner avisos)",
+      "title": "Configurar nueva imagen sede electrónica (colores personalizados, banner y banner avisos)",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_262",
       "title_i18n": {
         "eu": "Konfiguratu egoitza elektronikoaren irudi berria (kolore pertsonalizatuak, bannerra eta bannerra)",
-        "gl": "Configurar nova imaxe sede electrónica ( cores personalizadas, banner e banner avisos)",
-        "ca": "Configurar nova imatge sedi electrònica ( colors personalitzats, bàner i bàner avisos)",
-        "va": "Configurar nova imatge sede electrònica ( colors personalitzats, bàner i bàner avisos)"
+        "gl": "Configurar nova imaxe sede electrónica (cores personalizadas, banner e banner avisos)",
+        "ca": "Configurar nova imatge sedi electrònica (colors personalitzats, bàner i bàner avisos)",
+        "va": "Configurar nova imatge sede electrònica (colors personalitzats, bàner i bàner avisos)"
       }
     },
     {
@@ -3309,15 +3309,15 @@ window.App.seedData = {
       "instruction_id": "i2",
       "submatter_id": "s21",
       "work_line_id": "w4",
-      "title": "Implantar novedades 2025: Actualización tramitación reglada conforme nuevas funcionalidades (finalizar automáticamente, nuevas opcines de iniciación inmediata, nuevas condiciones al infalizar la tarea, ejecución sin intervención humana",
+      "title": "Implantar novedades 2025: Actualización tramitación reglada conforme nuevas funcionalidades (finalizar automáticamente, nuevas opciones de iniciación inmediata, nuevas condiciones al finalizar la tarea, ejecución sin intervención humana",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": null,
       "title_i18n": {
-        "eu": "Berritasunak ezartzea 2025ean: izapide arautua eguneratzea funtzionaltasun berrien arabera (automatikoki amaitzea, berehala hasteko aukera berriak, zeregina infaltzean baldintza berriak, gizakiaren esku-hartzerik gabe gauzatzea)",
-        "gl": "Implantar novidades 2025: Actualización tramitación regrada conforme novas funcionalidades (finalizar automaticamente, novas opcines de iniciación inmediata, novas condicións ao infalizar a tarefa, execución sen intervención humana",
-        "ca": "Implantar novetats 2025: Actualització tramitació reglada conforme noves funcionalitats (finalitzar automàticament, noves opcines d'iniciació immediata, noves condicions al infalizar la tasca, execució sense intervenció humana",
-        "va": "Implantar novetats 2025: Actualització tramitació reglada conforme noves funcionalitats (finalitzar automàticament, noves opcines d'iniciació immediata, noves condicions al infalizar la tasca, execució sense intervenció humana"
+        "eu": "Berritasunak ezartzea 2025ean: izapidetze arautua eguneratzea funtzionaltasun berrien arabera (automatikoki amaitzea, berehala hasteko aukera berriak, ataza amaitzean baldintza berriak, gizakiaren esku-hartzerik gabe gauzatzea)",
+        "gl": "Implantar novidades 2025: Actualización tramitación regrada conforme novas funcionalidades (finalizar automaticamente, novas opcións de iniciación inmediata, novas condicións ao finalizar a tarefa, execución sen intervención humana",
+        "ca": "Implantar novetats 2025: Actualització tramitació reglada conforme noves funcionalitats (finalitzar automàticament, noves opcions d'iniciació immediata, noves condicions en finalitzar la tasca, execució sense intervenció humana",
+        "va": "Implantar novetats 2025: Actualització tramitació reglada conforme noves funcionalitats (finalitzar automàticament, noves opcions d'iniciació immediata, noves condicions en finalitzar la tasca, execució sense intervenció humana"
       }
     },
     {
@@ -3405,15 +3405,15 @@ window.App.seedData = {
       "instruction_id": "i2",
       "submatter_id": "s33",
       "work_line_id": "w4",
-      "title": "Mantenimiento/actualización de piés de recurso",
+      "title": "Mantenimiento/actualización de pies de recurso",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": null,
       "title_i18n": {
-        "eu": "Baliabideko oinak mantentzea/eguneratzea",
-        "gl": "Mantemento/actualización de piés de recurso",
-        "ca": "Manteniment/actualització de piés de recurs",
-        "va": "Manteniment/actualització de piés de recurs"
+        "eu": "Baliabide-oinak mantentzea/eguneratzea",
+        "gl": "Mantemento/actualización de pés de recurso",
+        "ca": "Manteniment/actualització de peus de recurs",
+        "va": "Manteniment/actualització de peus de recurs"
       }
     }
   ]
