@@ -829,15 +829,15 @@ window.App.seedData = {
       "instruction_id": "i1",
       "submatter_id": "s11",
       "work_line_id": "w6",
-      "title": "Activar la integración con el Tablon Edictal Único del BOE",
+      "title": "Activar la integración con el Tablón Edictal Único del BOE",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_040",
       "title_i18n": {
-        "eu": "BOEko Ediktu Taula Bakarrarekiko integrazioa aktibatzea",
-        "gl": "Activar a integración co Tablon Edictal Único do BOE",
-        "ca": "Activar la integració amb el Tablon Edictal Únic del BOE",
-        "va": "Activar la integració amb el Tablon Edictal Únic del BOE"
+        "eu": "BOEko ediktu-taula bakarrarekiko integrazioa aktibatzea",
+        "gl": "Activar a integración co Taboleiro Edictal Único do BOE",
+        "ca": "Activar la integració amb el Tauló Edictal Únic del BOE",
+        "va": "Activar la integració amb el Tauló Edictal Únic del BOE"
       }
     },
     {
@@ -2146,10 +2146,10 @@ window.App.seedData = {
       "year": 2026,
       "legacy_item_code": "IE_173",
       "title_i18n": {
-        "eu": "Kopia autentikoa (baimenak eta digitalizazio-karpetak) kofiguratzea",
-        "gl": "Cofigurar copia auténtica (permisos e cartafoles de dixitalización)",
-        "ca": "Cofigurar còpia autèntica (permisos i carpetes de digitalització)",
-        "va": "Cofigurar còpia autèntica (permisos i carpetes de digitalització)"
+        "eu": "Kopia autentikoa konfiguratzea (baimenak eta digitalizazio-karpetak)",
+        "gl": "Configurar copia auténtica (permisos e cartafoles de dixitalización)",
+        "ca": "Configurar còpia autèntica (permisos i carpetes de digitalització)",
+        "va": "Configurar còpia autèntica (permisos i carpetes de digitalització)"
       }
     },
     {
@@ -2413,15 +2413,15 @@ window.App.seedData = {
       "instruction_id": "i3",
       "submatter_id": "s9",
       "work_line_id": "w1",
-      "title": "Adaptación espacio fisico y tecnológico",
+      "title": "Adaptación espacio físico y tecnológico",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_201",
       "title_i18n": {
-        "eu": "Espazio fisikoaren eta teknologikoaren egokitzapena",
-        "gl": "Adaptación espazo fisico e tecnolóxico",
-        "ca": "Adaptació espai fisico i tecnològic",
-        "va": "Adaptació espai fisico i tecnològic"
+        "eu": "Espazio fisiko eta teknologikoa egokitzea",
+        "gl": "Adaptación espazo físico e tecnolóxico",
+        "ca": "Adaptació espai físic i tecnològic",
+        "va": "Adaptació espai físic i tecnològic"
       }
     },
     {
@@ -2589,15 +2589,15 @@ window.App.seedData = {
       "instruction_id": "i7",
       "submatter_id": "s35",
       "work_line_id": "w7",
-      "title": "Implantar el uso de las búsquedas avanzadas de manera transversal en la entidad, atendiendo a las necesidades particulares de cada area/usuario,",
+      "title": "Implantar el uso de las búsquedas avanzadas de manera transversal en la entidad, atendiendo a las necesidades particulares de cada área/usuario",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_220",
       "title_i18n": {
         "eu": "Bilaketa aurreratuen erabilera zeharka ezartzea erakundean, arlo/erabiltzaile bakoitzaren premia bereziei erantzunez",
-        "gl": "Implantar o uso das procuras avanzadas de maneira transversal na entidade, atendendo ás necesidades particulares de cada area/usuario",
-        "ca": "Implantar l'ús de les cerques avançades de manera transversal en l'entitat, ateses les necessitats particulars de cada area/usuari,\"",
-        "va": "Implantar l'ús de les busques avançades de manera transversal en l'entitat, ateses les necessitats particulars de cada area/usuari"
+        "gl": "Implantar o uso das procuras avanzadas de maneira transversal na entidade, atendendo ás necesidades particulares de cada área/usuario",
+        "ca": "Implantar l'ús de les cerques avançades de manera transversal en l'entitat, ateses les necessitats particulars de cada àrea/usuari",
+        "va": "Implantar l'ús de les busques avançades de manera transversal en l'entitat, ateses les necessitats particulars de cada àrea/usuari"
       }
     },
     {
@@ -2877,15 +2877,15 @@ window.App.seedData = {
       "instruction_id": "i2",
       "submatter_id": "s33",
       "work_line_id": "w2",
-      "title": "Configuración de piés de recurso",
+      "title": "Configuración de pies de recurso",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_241",
       "title_i18n": {
         "eu": "Baliabide-oinen konfigurazioa",
-        "gl": "Configuración de piés de recurso",
-        "ca": "Configuració de piés de recurs",
-        "va": "Configuració de piés de recurs"
+        "gl": "Configuración de pés de recurso",
+        "ca": "Configuració de peus de recurs",
+        "va": "Configuració de peus de recurs"
       }
     },
     {
@@ -3053,15 +3053,15 @@ window.App.seedData = {
       "instruction_id": "i1",
       "submatter_id": "s2",
       "work_line_id": "w3",
-      "title": "Los usuarios apoderados van revisando periódicamente que usuarios deben activarse/desdactivarse y la composición y flujos de trabajo de los grupos de la entidad",
+      "title": "Los usuarios apoderados van revisando periódicamente que usuarios deben activarse/desactivarse y la composición y flujos de trabajo de los grupos de la entidad",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_258",
       "title_i18n": {
-        "eu": "Erabiltzaile ahaldunek aldian-aldian berrikusten dute zein erabiltzaile aktibatu/desaktibatu behar diren eta erakundeko taldeen osaera eta lan-fluxuak",
-        "gl": "Os usuarios apoderados van revisando periodicamente que usuarios deben activarse/desdactivarse e a composición e fluxos de traballo dos grupos da entidade",
-        "ca": "Els usuaris apoderats van revisant periòdicament que usuaris han d'activar-se/desdactivarse i la composició i fluxos de treball dels grups de l'entitat",
-        "va": "Els usuaris apoderats van revisant periòdicament que usuaris han d'activar-se/desdactivarse i la composició i fluxos de treball dels grups de l'entitat"
+        "eu": "Erabiltzaile ahaldunek aldizka berrikusten dute zein erabiltzaile aktibatu/desaktibatu behar diren eta erakundeko taldeen osaera eta lan-fluxuak",
+        "gl": "Os usuarios apoderados van revisando periodicamente que usuarios deben activarse/desactivarse e a composición e fluxos de traballo dos grupos da entidade",
+        "ca": "Els usuaris apoderats van revisant periòdicament que usuaris han d'activar-se/desactivar-se i la composició i fluxos de treball dels grups de l'entitat",
+        "va": "Els usuaris apoderats van revisant periòdicament que usuaris han d'activar-se/desactivar-se i la composició i fluxos de treball dels grups de l'entitat"
       }
     },
     {
@@ -3149,15 +3149,15 @@ window.App.seedData = {
       "instruction_id": "i3",
       "submatter_id": "s13",
       "work_line_id": "w6",
-      "title": "Desactivación mail aviso entidades con enotum",
+      "title": "Desactivación mail aviso entidades con e-NOTUM",
       "status": "Activo",
       "year": 2026,
       "legacy_item_code": "IE_263",
       "title_i18n": {
-        "eu": "Enotuma duten erakundeen abisu-mezu elektronikoa desaktibatzea",
-        "gl": "Desactivación mail aviso entidades con enotum",
-        "ca": "Desactivació mail aviso entitats amb enotum",
-        "va": "Desactivació mail avise entitats amb enotum"
+        "eu": "e-NOTUM duten erakundeen abisu-mezu elektronikoa desaktibatzea",
+        "gl": "Desactivación mail aviso entidades con e-NOTUM",
+        "ca": "Desactivació mail aviso entitats e-NOTUM",
+        "va": "Desactivació mail avise entitats amb e-NOTUM"
       }
     },
     {
