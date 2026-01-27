@@ -1,8 +1,8 @@
 window.App = window.App || {};
 window.App.seedData = {
   "schema_version": 2,
-  "seed_version": 5,
-  "updated_at": "2026-01-20T07:51:56.986Z",
+  "seed_version": 6,
+  "updated_at": "2026-01-27T00:00:00.000Z",
   "commissions": [
     {
       "id": "c1",

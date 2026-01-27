@@ -44,7 +44,7 @@ const loadDb = () => {
     }
     const normalized = normalizeDb(parsed);
     const needsSeedUpdate = SEED_VERSION !== normalized.seed_version;
-    const enriched = applyI18nFromSeed(normalized);
+    const enriched = applySeedUpdates(normalized, { force: needsSeedUpdate });
     if (needsSeedUpdate || enriched.changed) {
       const updated = {
         ...enriched.db,
@@ -78,7 +78,8 @@ const normalizeDb = (db) => {
   return normalized;
 };
 
-const applyI18nFromSeed = (db) => {
+const applySeedUpdates = (db, options = {}) => {
+  const { force = false } = options;
   if (!seedData) {
     return { db, changed: false };
   }
@@ -108,7 +109,40 @@ const applyI18nFromSeed = (db) => {
 
   const instructions = mergeI18n(db.instructions, seedInstructions, "name_i18n");
   const work_lines = mergeI18n(db.work_lines, seedWorkLines, "display_name_i18n");
-  const items_objetivo = mergeI18n(db.items_objetivo, seedItems, "title_i18n");
+  const items_objetivo = db.items_objetivo.map((item) => {
+    const seed = seedItems.get(item.id);
+    if (!seed) return item;
+
+    let next = item;
+    if (force && seed.title && seed.title !== item.title) {
+      next = { ...next, title: seed.title };
+      changed = true;
+    }
+
+    const seedI18n = seed.title_i18n;
+    if (!seedI18n) return next;
+
+    if (force) {
+      const hasDiff = JSON.stringify(seedI18n) !== JSON.stringify(next.title_i18n || {});
+      if (hasDiff) {
+        changed = true;
+        return { ...next, title_i18n: { ...seedI18n } };
+      }
+      return next;
+    }
+
+    if (next.title_i18n && typeof next.title_i18n === "object") {
+      const merged = { ...seedI18n, ...next.title_i18n };
+      const hasDiff = JSON.stringify(merged) !== JSON.stringify(next.title_i18n);
+      if (hasDiff) {
+        changed = true;
+        return { ...next, title_i18n: merged };
+      }
+      return next;
+    }
+    changed = true;
+    return { ...next, title_i18n: { ...seedI18n } };
+  });
 
   if (!changed) {
     return { db, changed: false };
@@ -128,7 +162,7 @@ const applyI18nFromSeed = (db) => {
 const migrateDb = (db) => {
   const normalized = normalizeDb({ ...emptyDb(), ...db, schema_version: SCHEMA_VERSION });
   return {
-    ...applyI18nFromSeed(normalized).db,
+    ...applySeedUpdates(normalized, { force: true }).db,
     seed_version: SEED_VERSION
   };
 };
