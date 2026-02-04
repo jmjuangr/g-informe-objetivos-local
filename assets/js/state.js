@@ -6,8 +6,7 @@ const LANGUAGE_STORAGE_KEY = "ui_language_v1";
 const defaultState = () => ({
   header: {
     entity: "",
-    manager: "",
-    logo: "Gestiona"
+    manager: ""
   },
   selections: []
 });
@@ -117,8 +116,7 @@ const importDraft = (payload) => {
   reportState = {
     header: {
       entity: payload.header?.entity || "",
-      manager: payload.header?.manager || "",
-      logo: payload.header?.logo?.trim() ? payload.header.logo : "Gestiona"
+      manager: payload.header?.manager || ""
     },
     selections: Array.isArray(payload.selections)
       ? payload.selections.map((entry) => ({

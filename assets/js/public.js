@@ -71,7 +71,6 @@ const { generateDocx } = app.docx;
 
 const initPublic = ({ showToast }) => {
   const entityInput = document.querySelector("#header-entity");
-  const logoSelect = document.querySelector("#header-logo");
   const languageSelect = document.querySelector("#header-language");
   const managerInput = document.querySelector("#header-manager");
   const instructionSelect = document.querySelector("#filter-instruction");
@@ -461,9 +460,6 @@ const initPublic = ({ showToast }) => {
     const { header } = getReportState();
     entityInput.value = header.entity;
     managerInput.value = header.manager;
-    if (logoSelect) {
-      logoSelect.value = header.logo || "";
-    }
     if (languageSelect) {
       languageSelect.value = currentLanguage;
     }
@@ -483,12 +479,6 @@ const initPublic = ({ showToast }) => {
   entityInput.addEventListener("input", (event) => {
     setHeader({ entity: event.target.value });
   });
-
-  if (logoSelect) {
-    logoSelect.addEventListener("change", (event) => {
-      setHeader({ logo: event.target.value });
-    });
-  }
 
   managerInput.addEventListener("input", (event) => {
     setHeader({ manager: event.target.value });

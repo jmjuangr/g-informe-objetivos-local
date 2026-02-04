@@ -42,9 +42,22 @@ const generateDocx = async ({ header, selections }) => {
     return titleA.localeCompare(titleB);
   };
 
-  const getLogoBytes = async (logoKey) => {
-    if (!window.App?.logo?.getLogoBytes) return null;
-    return window.App.logo.getLogoBytes(logoKey);
+  const base64ToBytes = (base64) => {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  };
+
+  const getLogoBytes = () => {
+    const base64 = window.App?.logoPngBase64;
+    if (!base64) {
+      return null;
+    }
+    return base64ToBytes(base64);
   };
 
   const grouped = selections.reduce((acc, item) => {
@@ -77,12 +90,7 @@ const generateDocx = async ({ header, selections }) => {
     ]
   });
 
-  let logoBytes = null;
-  try {
-    logoBytes = await getLogoBytes(header.logo);
-  } catch (error) {
-    console.warn("No se pudo cargar el logo para el Word.", error);
-  }
+  const logoBytes = getLogoBytes();
   if (logoBytes) {
     const logo = new ImageRun({
       data: logoBytes,

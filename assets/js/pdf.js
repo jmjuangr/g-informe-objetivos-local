@@ -26,9 +26,22 @@ const generatePdf = async ({ header, selections }) => {
   let cursorY = pageSize[1] - margin;
   let isFirstPage = true;
 
-  const getLogoBytes = async (logoKey) => {
-    if (!window.App?.logo?.getLogoBytes) return null;
-    return window.App.logo.getLogoBytes(logoKey);
+  const base64ToBytes = (base64) => {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  };
+
+  const getLogoBytes = () => {
+    const base64 = window.App?.logoPngBase64;
+    if (!base64) {
+      throw new Error("Logo embebido no disponible");
+    }
+    return base64ToBytes(base64);
   };
 
   const drawLine = (text, options = {}) => {
@@ -195,10 +208,7 @@ const generatePdf = async ({ header, selections }) => {
         borderWidth: 0
       });
 
-      const logoBytes = await getLogoBytes(header.logo);
-      if (!logoBytes) {
-        throw new Error("Logo no disponible");
-      }
+      const logoBytes = getLogoBytes();
       const logoImage = await pdfDoc.embedPng(logoBytes);
       const logoHeight = 36;
       const scale = logoHeight / logoImage.height;
