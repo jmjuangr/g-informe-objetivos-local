@@ -52,8 +52,10 @@ const generateDocx = async ({ header, selections }) => {
     return bytes;
   };
 
-  const getLogoBytes = () => {
-    const base64 = window.App?.logoPngBase64;
+  const getLogoBytes = (logoKey) => {
+    const base64 =
+      (logoKey && window.App?.logoBase64 && window.App.logoBase64[logoKey]) ||
+      window.App?.logoPngBase64;
     if (!base64) {
       return null;
     }
@@ -90,7 +92,7 @@ const generateDocx = async ({ header, selections }) => {
     ]
   });
 
-  const logoBytes = getLogoBytes();
+  const logoBytes = getLogoBytes(header.logo);
   if (logoBytes) {
     const logo = new ImageRun({
       data: logoBytes,
