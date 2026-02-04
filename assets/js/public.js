@@ -7,7 +7,7 @@ const {
   getReportState,
   getLanguage,
   importDraft,
-  plazoOptions,
+  getPlazoOptions,
   removeSelection,
   setLanguage,
   setHeader,
@@ -410,7 +410,9 @@ const initPublic = ({ showToast }) => {
 
       const plazoSelect = document.createElement("select");
       plazoSelect.appendChild(buildOption("", "Selecciona"));
-      plazoOptions.forEach((option) => plazoSelect.appendChild(buildOption(option, option)));
+      getPlazoOptions(currentLanguage).forEach((option) =>
+        plazoSelect.appendChild(buildOption(option, option))
+      );
       plazoSelect.value = item.plazo;
       plazoSelect.addEventListener("change", (event) => {
         setPlazo(item.item_uuid, event.target.value);

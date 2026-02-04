@@ -30,6 +30,16 @@ const generateDocx = async ({ header, selections }) => {
       .replace(/\s+/g, " ")
       .trim();
 
+  const getLabels = () => {
+    const language = app.state?.getLanguage ? app.state.getLanguage() : "es";
+    const labelsByLanguage = {
+      es: { entity: "Entidad", plazo: "Plazo", manager: "Gestor/a" },
+      ca: { entity: "Entitat", plazo: "Termini", manager: "Gestor/a" },
+      va: { entity: "Entitat", plazo: "Termini", manager: "Gestor/a" }
+    };
+    return labelsByLanguage[language] || labelsByLanguage.es;
+  };
+
   const compareItemsByWorkLine = (a, b) => {
     const orderA = Number.isFinite(a.work_line_sort_order) ? a.work_line_sort_order : Number.MAX_SAFE_INTEGER;
     const orderB = Number.isFinite(b.work_line_sort_order) ? b.work_line_sort_order : Number.MAX_SAFE_INTEGER;
@@ -131,14 +141,16 @@ const generateDocx = async ({ header, selections }) => {
     children.push(headerTitle);
   }
 
+  const labels = getLabels();
+
   children.push(
     new Paragraph({
-      children: [new TextRun({ text: `Entidad: ${safeText(header.entity)}`, size: 22 })]
+      children: [new TextRun({ text: `${labels.entity}: ${safeText(header.entity)}`, size: 22 })]
     })
   );
   children.push(
     new Paragraph({
-      children: [new TextRun({ text: `Gestor/a: ${safeText(header.manager)}`, size: 22 })]
+      children: [new TextRun({ text: `${labels.manager}: ${safeText(header.manager)}`, size: 22 })]
     })
   );
   children.push(new Paragraph({ text: " " }));
@@ -178,7 +190,7 @@ const generateDocx = async ({ header, selections }) => {
         margins: { top: 120, bottom: 120, left: 120, right: 120 },
         children: [
           new Paragraph({
-            children: [new TextRun({ text: plazo ? `Plazo: ${plazo}` : "", size: 22 })]
+            children: [new TextRun({ text: plazo ? `${labels.plazo}: ${plazo}` : "", size: 22 })]
           })
         ]
       });

@@ -15,6 +15,16 @@ const generatePdf = async ({ header, selections }) => {
       .replace(/[^\x20-\x7E]/g, "")
       .trim();
 
+  const getLabels = () => {
+    const language = app.state?.getLanguage ? app.state.getLanguage() : "es";
+    const labelsByLanguage = {
+      es: { entity: "Entidad", manager: "Gestor/a" },
+      ca: { entity: "Entitat", manager: "Gestor/a" },
+      va: { entity: "Entitat", manager: "Gestor/a" }
+    };
+    return labelsByLanguage[language] || labelsByLanguage.es;
+  };
+
   const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
   const pdfDoc = await PDFDocument.create();
   const pageSize = [841.89, 595.28];
@@ -248,8 +258,9 @@ const generatePdf = async ({ header, selections }) => {
   if (!headerTitleDrawn) {
     drawLine(headerTitle, { size: headerTitleSize, bold: true, spacing: 10 });
   }
-  drawLine(`Entidad: ${safeText(header.entity)}`);
-  drawLine(`Gestor/a: ${safeText(header.manager)}`);
+  const labels = getLabels();
+  drawLine(`${labels.entity}: ${safeText(header.entity)}`);
+  drawLine(`${labels.manager}: ${safeText(header.manager)}`);
   drawLine(" ");
 
   const grouped = selections.reduce((acc, item) => {

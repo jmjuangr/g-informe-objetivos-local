@@ -140,13 +140,32 @@ const importDraft = (payload) => {
   };
 };
 
-const plazoOptions = [
-  "Primer trimestre",
-  "Segundo trimestre",
-  "Tercer trimestre",
-  "Cuarto trimestre",
-  "Pendiente de fecha"
-];
+const plazoOptionsByLanguage = {
+  es: [
+    "Primer trimestre",
+    "Segundo trimestre",
+    "Tercer trimestre",
+    "Cuarto trimestre",
+    "Pendiente de fecha"
+  ],
+  ca: [
+    "Primer trimestre",
+    "Segon trimestre",
+    "Tercer trimestre",
+    "Quart trimestre",
+    "Pendent de data"
+  ],
+  va: [
+    "Primer trimestre",
+    "Segon trimestre",
+    "Tercer trimestre",
+    "Quart trimestre",
+    "Pendent de data"
+  ]
+};
+
+const getPlazoOptions = (language) =>
+  plazoOptionsByLanguage[language] || plazoOptionsByLanguage.es;
 
 app.state = {
   getReportState,
@@ -161,6 +180,6 @@ app.state = {
   syncSelectionsFromCatalog,
   exportDraft,
   importDraft,
-  plazoOptions
+  getPlazoOptions
 };
 })();
