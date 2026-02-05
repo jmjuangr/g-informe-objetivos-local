@@ -10,17 +10,18 @@ const generatePdf = async ({ header, selections }) => {
     String(value ?? "")
       .replace(/[\r\n\t]+/g, " ")
       .replace(/\s+/g, " ")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\x20-\x7E]/g, "")
+      .replace(/[\u0000-\u001F\u007F]/g, " ")
+      .normalize("NFC")
       .trim();
 
   const getLabels = () => {
     const language = app.state?.getLanguage ? app.state.getLanguage() : "es";
     const labelsByLanguage = {
-      es: { entity: "Entidad", manager: "Gestor/a" },
-      ca: { entity: "Entitat", manager: "Gestor/a" },
-      va: { entity: "Entitat", manager: "Gestor/a" }
+      es: { entity: "Entidad", manager: "Gestor/a", observations: "Observaciones" },
+      ca: { entity: "Entitat", manager: "Gestor/a", observations: "Observacions" },
+      va: { entity: "Entitat", manager: "Gestor/a", observations: "Observacions" },
+      gl: { entity: "Entidad", manager: "Gestor/a", observations: "Observacións" },
+      eu: { entity: "Entidad", manager: "Gestor/a", observations: "Observaciones" }
     };
     return labelsByLanguage[language] || labelsByLanguage.es;
   };
@@ -29,8 +30,36 @@ const generatePdf = async ({ header, selections }) => {
   const pdfDoc = await PDFDocument.create();
   const pageSize = [841.89, 595.28];
   let page = pdfDoc.addPage(pageSize);
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold || StandardFonts.Helvetica);
+  const loadFontBytes = async (path) => {
+    try {
+      const response = await fetch(path);
+      if (!response.ok) return null;
+      return new Uint8Array(await response.arrayBuffer());
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const embedCustomFonts = async () => {
+    if (!pdfDoc.registerFontkit || !window.fontkit) return null;
+    pdfDoc.registerFontkit(window.fontkit);
+    const [regularBytes, boldBytes] = await Promise.all([
+      loadFontBytes("assets/vendor/fonts/DejaVuSans.ttf"),
+      loadFontBytes("assets/vendor/fonts/DejaVuSans-Bold.ttf")
+    ]);
+    if (!regularBytes) return null;
+    const regular = await pdfDoc.embedFont(regularBytes, { subset: true });
+    const bold = boldBytes ? await pdfDoc.embedFont(boldBytes, { subset: true }) : regular;
+    return { regular, bold };
+  };
+
+  const customFonts = await embedCustomFonts();
+  const font = customFonts
+    ? customFonts.regular
+    : await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = customFonts
+    ? customFonts.bold
+    : await pdfDoc.embedFont(StandardFonts.HelveticaBold || StandardFonts.Helvetica);
 
   const margin = 50;
   let cursorY = pageSize[1] - margin;
@@ -285,7 +314,7 @@ const generatePdf = async ({ header, selections }) => {
       drawWrappedRow({
         title,
         plazo: plazo ? `Plazo: ${plazo}` : "",
-        observations: observations ? `Observaciones: ${observations}` : "",
+    observations: observations ? `${labels.observations}: ${observations}` : "",
         hasExtra,
         rowIndex: index
       });

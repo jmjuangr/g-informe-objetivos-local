@@ -33,9 +33,11 @@ const generateDocx = async ({ header, selections }) => {
   const getLabels = () => {
     const language = app.state?.getLanguage ? app.state.getLanguage() : "es";
     const labelsByLanguage = {
-      es: { entity: "Entidad", plazo: "Plazo", manager: "Gestor/a" },
-      ca: { entity: "Entitat", plazo: "Termini", manager: "Gestor/a" },
-      va: { entity: "Entitat", plazo: "Termini", manager: "Gestor/a" }
+      es: { entity: "Entidad", plazo: "Plazo", manager: "Gestor/a", observations: "Observaciones" },
+      ca: { entity: "Entitat", plazo: "Termini", manager: "Gestor/a", observations: "Observacions" },
+      va: { entity: "Entitat", plazo: "Termini", manager: "Gestor/a", observations: "Observacions" },
+      gl: { entity: "Entidad", plazo: "Plazo", manager: "Gestor/a", observations: "Observacións" },
+      eu: { entity: "Entidad", plazo: "Plazo", manager: "Gestor/a", observations: "Observaciones" }
     };
     return labelsByLanguage[language] || labelsByLanguage.es;
   };
@@ -200,7 +202,7 @@ const generateDocx = async ({ header, selections }) => {
         margins: { top: 120, bottom: 120, left: 120, right: 120 },
         children: [
           new Paragraph({
-            children: [new TextRun({ text: observations ? `Observaciones: ${observations}` : "", size: 22 })]
+            children: [new TextRun({ text: observations ? `${labels.observations}: ${observations}` : "", size: 22 })]
           })
         ]
       });

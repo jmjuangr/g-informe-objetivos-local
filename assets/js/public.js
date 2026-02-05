@@ -18,6 +18,17 @@ const {
 const { generatePdf } = app.pdf;
 const { generateDocx } = app.docx;
 
+  const observationsLabelByLanguage = {
+    es: "Observaciones",
+    ca: "Observacions",
+    va: "Observacions",
+    gl: "Observacións",
+    eu: "Observaciones"
+  };
+
+  const getObservationsLabel = (language) =>
+    observationsLabelByLanguage[language] || observationsLabelByLanguage.es;
+
   const buildOption = (value, label) => {
     const option = document.createElement("option");
     option.value = value;
@@ -420,7 +431,7 @@ const initPublic = ({ showToast }) => {
 
       const observationsInput = document.createElement("input");
       observationsInput.type = "text";
-      observationsInput.placeholder = "Observaciones";
+      observationsInput.placeholder = getObservationsLabel(currentLanguage);
       observationsInput.value = item.observations || "";
       observationsInput.addEventListener("input", (event) => {
         setObservations(item.item_uuid, event.target.value);
