@@ -1603,7 +1603,7 @@ window.App.seedData = {
       "legacy_item_code": "IE_124",
       "title_i18n": {
         "eu": "Erabiltzaileen plantillen funtzionaltasuna ezartzea",
-        "gl": ") Implantar a funcionalidade de persoais de usuarios",
+        "gl": "Implantar a funcionalidade de persoais de usuarios",
         "ca": "Implantar la funcionalitat de plantilles d'usuaris ",
         "va": "Implantar la funcionalitat de plantilles d'usuaris"
       }
