@@ -3415,6 +3415,23 @@ window.App.seedData = {
         "ca": "Manteniment/actualització de peus de recurs",
         "va": "Manteniment/actualització de peus de recurs"
       }
+    },
+
+    {
+      "id": "o185",
+      "instruction_id": "i1",
+      "submatter_id": "s14",
+      "work_line_id": "w7",
+      "title": "Activar la integración DRAG-Gestiona",
+      "status": "Activo",
+      "year": 2026,
+      "legacy_item_code": null,
+      "title_i18n": {
+        "eu": "Aktibatu DRAG-Gestiona integrazioa",
+        "gl": "Activar a integración DRAG-Gestiona",
+        "ca": "Activar la integració DRAG-Gestiona",
+        "va": "Activar la integración DRAG-Gestiona"
+      }
     }
   ]
 };
