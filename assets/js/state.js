@@ -13,7 +13,7 @@ const defaultState = () => ({
 });
 
 let reportState = defaultState();
-let uiLanguage = "es";
+let uiLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || "es";
 localStorage.setItem(LANGUAGE_STORAGE_KEY, uiLanguage);
 
 const getReportState = () => structuredClone(reportState);
@@ -108,11 +108,17 @@ const syncSelectionsFromCatalog = (items) => {
   };
 };
 
-const exportDraft = () => JSON.stringify(getReportState(), null, 2);
+const exportDraft = () =>
+  JSON.stringify({ ...getReportState(), language: getLanguage() }, null, 2);
 
 const importDraft = (payload) => {
   if (!payload || typeof payload !== "object") {
     throw new Error("Formato de borrador inválido");
+  }
+  if (payload.language) {
+    setLanguage(payload.language);
+  } else if (payload.header?.language) {
+    setLanguage(payload.header.language);
   }
   reportState = {
     header: {

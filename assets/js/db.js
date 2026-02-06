@@ -89,6 +89,15 @@ const applySeedUpdates = (db, options = {}) => {
   const seedWorkLines = new Map((seedData.work_lines || []).map((item) => [item.id, item]));
   const seedItems = new Map((seedData.items_objetivo || []).map((item) => [item.id, item]));
 
+  const mergeMissing = (list, seedList) => {
+    if (!force) return list;
+    const existingIds = new Set(list.map((item) => item.id));
+    const additions = (seedList || []).filter((item) => !existingIds.has(item.id));
+    if (!additions.length) return list;
+    changed = true;
+    return [...list, ...additions];
+  };
+
   const mergeI18n = (list, seedMap, field) =>
     list.map((item) => {
       const seed = seedMap.get(item.id);
@@ -107,9 +116,20 @@ const applySeedUpdates = (db, options = {}) => {
       return { ...item, [field]: { ...seedI18n } };
     });
 
-  const instructions = mergeI18n(db.instructions, seedInstructions, "name_i18n");
-  const work_lines = mergeI18n(db.work_lines, seedWorkLines, "display_name_i18n");
-  const items_objetivo = db.items_objetivo.map((item) => {
+  const commissions = mergeMissing(db.commissions, seedData.commissions);
+  const matters = mergeMissing(db.matters, seedData.matters);
+  const submatters = mergeMissing(db.submatters, seedData.submatters);
+  const instructions = mergeI18n(
+    mergeMissing(db.instructions, seedData.instructions),
+    seedInstructions,
+    "name_i18n"
+  );
+  const work_lines = mergeI18n(
+    mergeMissing(db.work_lines, seedData.work_lines),
+    seedWorkLines,
+    "display_name_i18n"
+  );
+  const items_objetivo = mergeMissing(db.items_objetivo, seedData.items_objetivo).map((item) => {
     const seed = seedItems.get(item.id);
     if (!seed) return item;
 
@@ -151,6 +171,9 @@ const applySeedUpdates = (db, options = {}) => {
   return {
     db: {
       ...db,
+      commissions,
+      matters,
+      submatters,
       instructions,
       work_lines,
       items_objetivo
